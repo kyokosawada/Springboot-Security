@@ -1,7 +1,8 @@
 package com.exist.helpdesk.controller;
 
-import com.exist.helpdesk.model.Role;
 import com.exist.helpdesk.service.RoleService;
+import com.exist.helpdesk.dto.RoleRequestDTO;
+import com.exist.helpdesk.dto.RoleResponseDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -18,23 +19,23 @@ public class RoleController {
     }
 
     @GetMapping
-    public List<Role> getAllRoles() {
+    public List<RoleResponseDTO> getAllRoles() {
         return roleService.getAllRoles();
     }
 
     @GetMapping("/{id}")
-    public Role getRoleById(@PathVariable Long id) {
+    public RoleResponseDTO getRoleById(@PathVariable Long id) {
         return roleService.getRoleById(id);
     }
 
     @PostMapping
-    public Role createRole(@RequestBody Role role) {
-        return roleService.createRole(role);
+    public RoleResponseDTO createRole(@RequestBody RoleRequestDTO request) {
+        return roleService.createRole(request);
     }
 
     @PutMapping("/{id}")
-    public Role updateRole(@PathVariable Long id, @RequestBody Role role) {
-        return roleService.updateRole(id, role);
+    public RoleResponseDTO updateRole(@PathVariable Long id, @RequestBody RoleRequestDTO request) {
+        return roleService.updateRole(id, request);
     }
 
     @DeleteMapping("/{id}")

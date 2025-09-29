@@ -1,7 +1,9 @@
 package com.exist.helpdesk.service;
 
+import com.exist.helpdesk.dto.RoleResponseDTO;
 import com.exist.helpdesk.model.Role;
 import com.exist.helpdesk.repository.RoleRepository;
+import com.exist.helpdesk.dto.RoleRequestDTO;
 import org.springframework.stereotype.Service;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -9,9 +11,6 @@ import java.util.List;
 
 @Service
 public class RoleService {
-    // This service encapsulates CRUD operations for job roles/positions.
-    // Could later prevent deletion if assigned, enforce uniqueness, etc.
-    // Delegates to RoleRepository (to be created next).
 
     private final RoleRepository roleRepository;
 
@@ -20,27 +19,39 @@ public class RoleService {
         this.roleRepository = roleRepository;
     }
 
-    public List<Role> getAllRoles() {
-        return roleRepository.findAll();
+    public List<RoleResponseDTO> getAllRoles() {
+        List<Role> roles = roleRepository.findAll();
+        return roles.stream()
+                .map(role -> new RoleResponseDTO(role.getId(), role.getName()))
+                .toList();
     }
 
-    public Role getRoleById(Long id) {
-        return roleRepository.findById(id).orElse(null);
+    public RoleResponseDTO getRoleById(Long id) {
+        Role role = roleRepository.findById(id).orElse(null);
+        if (role == null) return null;
+        return new RoleResponseDTO(role.getId(), role.getName());
     }
 
-    public Role createRole(Role role) {
-        return roleRepository.save(role);
+    public RoleResponseDTO createRole(RoleRequestDTO request) {
+        Role role = new Role();
+        role.setName(request.getName());
+        Role saved = roleRepository.save(role);
+        return new RoleResponseDTO(saved.getId(), saved.getName());
     }
 
-    public Role updateRole(Long id, Role updatedRole) {
-        if (roleRepository.existsById(id)) {
-            updatedRole.setId(id);
-            return roleRepository.save(updatedRole);
-        }
-        return null;
+    public RoleResponseDTO updateRole(Long id, RoleRequestDTO request) {
+        Role role = roleRepository.findById(id).orElse(null);
+        if (role == null) return null;
+        role.setName(request.getName());
+        Role saved = roleRepository.save(role);
+        return new RoleResponseDTO(saved.getId(), saved.getName());
     }
 
     public void deleteRole(Long id) {
         roleRepository.deleteById(id);
+    }
+
+    public Role getRoleEntityById(Long id) {
+        return roleRepository.findById(id).orElse(null);
     }
 }

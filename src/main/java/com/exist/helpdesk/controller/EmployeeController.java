@@ -1,9 +1,12 @@
 package com.exist.helpdesk.controller;
 
+import com.exist.helpdesk.dto.EmployeeRequestDTO;
 import com.exist.helpdesk.model.Employee;
 import com.exist.helpdesk.service.EmployeeService;
+import com.exist.helpdesk.dto.EmployeeResponseDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.http.ResponseEntity;
 
 import java.util.List;
 
@@ -28,17 +31,27 @@ public class EmployeeController {
     }
 
     @PostMapping
-    public Employee createEmployee(@RequestBody Employee employee) {
-        return employeeService.createEmployee(employee);
+    public EmployeeResponseDTO createEmployee(@RequestBody EmployeeRequestDTO request) {
+        return employeeService.createEmployee(request);
     }
 
     @PutMapping("/{id}")
-    public Employee updateEmployee(@PathVariable Long id, @RequestBody Employee employee) {
-        return employeeService.updateEmployee(id, employee);
+    public EmployeeResponseDTO updateEmployee(@PathVariable Long id, @RequestBody EmployeeRequestDTO request) {
+        return employeeService.updateEmployee(id, request);
     }
 
     @DeleteMapping("/{id}")
     public void deleteEmployee(@PathVariable Long id) {
         employeeService.deleteEmployee(id);
+    }
+
+    @PatchMapping("/{id}/role/{roleId}")
+    public ResponseEntity<EmployeeResponseDTO> assignRoleToEmployee(
+            @PathVariable Long id, @PathVariable Long roleId) {
+        EmployeeResponseDTO dto = employeeService.assignRoleToEmployee(id, roleId);
+        if (dto == null) {
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.ok(dto);
     }
 }
