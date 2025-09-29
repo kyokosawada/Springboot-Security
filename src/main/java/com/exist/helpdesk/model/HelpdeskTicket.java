@@ -46,7 +46,4 @@ public class HelpdeskTicket {
         DRAFT, FILED, INPROGRESS, CLOSED, DUPLICATE
     }
 
-    public void setTicketNumber(Long ticketNumber) {
-        this.ticketNumber = ticketNumber;
-    }
 }
