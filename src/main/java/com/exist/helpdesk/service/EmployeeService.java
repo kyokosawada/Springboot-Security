@@ -4,7 +4,8 @@ import com.exist.helpdesk.dto.EmployeeResponseDTO;
 import com.exist.helpdesk.model.Employee;
 import com.exist.helpdesk.repository.EmployeeRepository;
 import com.exist.helpdesk.model.Role;
-import com.exist.helpdesk.dto.EmployeeRequestDTO;
+import com.exist.helpdesk.dto.EmployeeCreateRequestDTO;
+import com.exist.helpdesk.dto.EmployeeUpdateRequestDTO;
 import com.exist.helpdesk.mapper.EmployeeMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -32,7 +33,7 @@ public class EmployeeService {
         return employeeRepository.findById(id).orElse(null);
     }
 
-    public EmployeeResponseDTO createEmployee(EmployeeRequestDTO request) {
+    public EmployeeResponseDTO createEmployee(EmployeeCreateRequestDTO request) {
         Role role = roleService.getRoleEntityById(request.getRoleId());
         Employee employee = employeeMapper.toEntity(request);
         employee.setRole(role);
@@ -40,13 +41,13 @@ public class EmployeeService {
         return employeeMapper.toResponse(saved);
     }
 
-    public EmployeeResponseDTO updateEmployee(Long id, EmployeeRequestDTO request) {
+    public EmployeeResponseDTO updateEmployee(Long id, EmployeeUpdateRequestDTO request) {
         Employee emp = employeeRepository.findById(id).orElse(null);
         if (emp == null) return null;
-        Role role = roleService.getRoleEntityById(request.getRoleId());
-        emp = employeeMapper.toEntity(request);
-        emp.setRole(role);
-        emp.setId(id); // ensure original id is kept
+        employeeMapper.updateEmployeeFromDto(request, emp);
+        if (request.getRoleId() != null) {
+            emp.setRole(roleService.getRoleEntityById(request.getRoleId()));
+        }
         Employee saved = employeeRepository.save(emp);
         return employeeMapper.toResponse(saved);
     }

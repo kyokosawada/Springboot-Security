@@ -1,6 +1,6 @@
 package com.exist.helpdesk.controller;
-
-import com.exist.helpdesk.dto.EmployeeRequestDTO;
+import com.exist.helpdesk.dto.EmployeeCreateRequestDTO;
+import com.exist.helpdesk.dto.EmployeeUpdateRequestDTO;
 import com.exist.helpdesk.model.Employee;
 import com.exist.helpdesk.service.EmployeeService;
 import com.exist.helpdesk.dto.EmployeeResponseDTO;
@@ -9,6 +9,8 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.http.ResponseEntity;
 
 import java.util.List;
+
+import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/api/employees")
@@ -31,12 +33,12 @@ public class EmployeeController {
     }
 
     @PostMapping
-    public EmployeeResponseDTO createEmployee(@RequestBody EmployeeRequestDTO request) {
+    public EmployeeResponseDTO createEmployee(@Valid @RequestBody EmployeeCreateRequestDTO request) {
         return employeeService.createEmployee(request);
     }
 
     @PutMapping("/{id}")
-    public EmployeeResponseDTO updateEmployee(@PathVariable Long id, @RequestBody EmployeeRequestDTO request) {
+    public EmployeeResponseDTO updateEmployee(@PathVariable Long id, @Valid @RequestBody EmployeeUpdateRequestDTO request) {
         return employeeService.updateEmployee(id, request);
     }
 

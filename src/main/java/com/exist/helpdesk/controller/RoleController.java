@@ -1,7 +1,8 @@
 package com.exist.helpdesk.controller;
 
 import com.exist.helpdesk.service.RoleService;
-import com.exist.helpdesk.dto.RoleRequestDTO;
+import com.exist.helpdesk.dto.RoleCreateRequestDTO;
+import com.exist.helpdesk.dto.RoleUpdateRequestDTO;
 import com.exist.helpdesk.dto.RoleResponseDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -29,12 +30,12 @@ public class RoleController {
     }
 
     @PostMapping
-    public RoleResponseDTO createRole(@RequestBody RoleRequestDTO request) {
+    public RoleResponseDTO createRole(@RequestBody RoleCreateRequestDTO request) {
         return roleService.createRole(request);
     }
 
     @PutMapping("/{id}")
-    public RoleResponseDTO updateRole(@PathVariable Long id, @RequestBody RoleRequestDTO request) {
+    public RoleResponseDTO updateRole(@PathVariable Long id, @RequestBody RoleUpdateRequestDTO request) {
         return roleService.updateRole(id, request);
     }
 

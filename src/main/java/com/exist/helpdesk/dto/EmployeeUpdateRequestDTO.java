@@ -6,7 +6,7 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class EmployeeRequestDTO {
+public class EmployeeUpdateRequestDTO {
     private String name;
     private Integer age;
     private String address;

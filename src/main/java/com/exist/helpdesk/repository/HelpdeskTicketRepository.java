@@ -4,5 +4,4 @@ import com.exist.helpdesk.model.HelpdeskTicket;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface HelpdeskTicketRepository extends JpaRepository<HelpdeskTicket, Long> {
-    // Add custom query methods as needed (e.g. findByAssignee, findByStatus)
 }

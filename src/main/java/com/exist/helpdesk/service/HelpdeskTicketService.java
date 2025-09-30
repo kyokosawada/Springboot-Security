@@ -9,11 +9,6 @@ import java.util.List;
 
 @Service
 public class HelpdeskTicketService {
-    // Encapsulates business logic for helpdesk tickets:
-    // - Filing new tickets
-    // - Updating, assigning, adding remarks, changing status
-    // - Listing by employee/assignee/status
-    // Would call HelpdeskTicketRepository (to be added).
 
     private final HelpdeskTicketRepository ticketRepository;
 

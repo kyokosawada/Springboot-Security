@@ -6,6 +6,7 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class RoleRequestDTO {
+public class RoleUpdateRequestDTO {
     private String name;
+    private String description;
 }
