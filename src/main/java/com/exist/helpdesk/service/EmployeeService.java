@@ -7,10 +7,17 @@ import com.exist.helpdesk.model.Role;
 import com.exist.helpdesk.dto.EmployeeCreateRequestDTO;
 import com.exist.helpdesk.dto.EmployeeUpdateRequestDTO;
 import com.exist.helpdesk.mapper.EmployeeMapper;
+import com.exist.helpdesk.dto.PaginatedResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 
 import java.util.List;
+import java.util.ArrayList;
 
 @Service
 public class EmployeeService {
@@ -25,18 +32,62 @@ public class EmployeeService {
         this.employeeMapper = employeeMapper;
     }
 
-    public List<Employee> getAllEmployees() {
-        return employeeRepository.findAll();
+
+    public PaginatedResponse<EmployeeResponseDTO> getEmployees(
+            int page, int size, String sortBy, String sortDir, String name, Integer age,
+            String address, String phone, String employmentStatus, Long roleId) {
+        Sort sort = sortDir.equalsIgnoreCase("asc") ? Sort.by(sortBy).ascending() : Sort.by(sortBy).descending();
+        Pageable pageable = PageRequest.of(page, size, sort);
+        List<Specification<Employee>> specs = new ArrayList<>();
+        if (name != null && !name.isBlank()) {
+            specs.add((root, query, cb) -> cb.like(cb.lower(root.get("name")), "%" + name.toLowerCase() + "%"));
+        }
+        if (age != null) {
+            specs.add((root, query, cb) -> cb.equal(root.get("age"), age));
+        }
+        if (address != null && !address.isBlank()) {
+            specs.add((root, query, cb) -> cb.like(cb.lower(root.get("address")), "%" + address.toLowerCase() + "%"));
+        }
+        if (phone != null && !phone.isBlank()) {
+            specs.add((root, query, cb) -> cb.like(cb.lower(root.get("phone")), "%" + phone.toLowerCase() + "%"));
+        }
+        if (employmentStatus != null && !employmentStatus.isBlank()) {
+            specs.add((root, query, cb) -> cb.equal(root.get("employmentStatus"), employmentStatus.toLowerCase()));
+        }
+        if (roleId != null) {
+            specs.add((root, query, cb) -> cb.equal(root.get("role").get("id"), roleId));
+        }
+        Specification<Employee> spec = specs.stream()
+                .reduce(Specification::and)
+                .orElse((root, query, cb) -> cb.conjunction());
+        Page<Employee> employeePage = employeeRepository.findAll(spec, pageable);
+        List<EmployeeResponseDTO> content = employeePage.getContent().stream()
+                .map(employeeMapper::toResponse)
+                .toList();
+        return PaginatedResponse.<EmployeeResponseDTO>builder()
+                .content(content)
+                .page(employeePage.getNumber())
+                .size(employeePage.getSize())
+                .totalElements(employeePage.getTotalElements())
+                .totalPages(employeePage.getTotalPages())
+                .last(employeePage.isLast())
+                .build();
     }
 
-    public Employee getEmployeeById(Long id) {
-        return employeeRepository.findById(id).orElse(null);
+    public EmployeeResponseDTO getEmployeeById(Long id) {
+        Employee employee = employeeRepository.findById(id).orElse(null);
+        return employee == null ? null : employeeMapper.toResponse(employee);
+    }
+
+    public Employee getEmployeeEntityById(Long id) {
+        return employeeRepository.findById(id).orElseThrow();
     }
 
     public EmployeeResponseDTO createEmployee(EmployeeCreateRequestDTO request) {
         Role role = roleService.getRoleEntityById(request.getRoleId());
         Employee employee = employeeMapper.toEntity(request);
         employee.setRole(role);
+
         Employee saved = employeeRepository.save(employee);
         return employeeMapper.toResponse(saved);
     }

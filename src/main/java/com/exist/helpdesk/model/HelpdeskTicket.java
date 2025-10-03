@@ -2,12 +2,13 @@ package com.exist.helpdesk.model;
 
 import jakarta.persistence.*;
 import lombok.*;
-import jakarta.validation.constraints.*;
 
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.ArrayList;
 
 @Entity
-@Table(name = "helpdesk_tickets")
+@Table(name = "tickets")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -15,35 +16,31 @@ import java.time.LocalDateTime;
 public class HelpdeskTicket {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long ticketNumber;
+    private Long id;
 
-    @NotBlank
+    @Column(nullable = false, unique = true)
+    private String ticketNumber;
+
     private String title;
-    @NotBlank
+
     private String body;
+
+    private String status;
 
     @ManyToOne
     @JoinColumn(name = "assignee_id")
     private Employee assignee;
 
-    @ManyToOne
-    @JoinColumn(name = "created_by_id")
-    private Employee createdBy;
-
-    @ManyToOne
-    @JoinColumn(name = "updated_by_id")
-    private Employee updatedBy;
-
-    @Enumerated(EnumType.STRING)
-    private Status status;
-
+    @Column(nullable = false)
     private LocalDateTime createdDate;
+
+    private String createdBy;
+
     private LocalDateTime updatedDate;
 
-    private String remarks;
+    private String updatedBy;
 
-    public enum Status {
-        DRAFT, FILED, INPROGRESS, CLOSED, DUPLICATE
-    }
-
+    @ElementCollection
+    @CollectionTable(name = "ticket_remarks", joinColumns = @JoinColumn(name = "ticket_id"))
+    private List<Remark> remarks = new ArrayList<>();
 }

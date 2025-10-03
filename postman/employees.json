@@ -1,0 +1,242 @@
+[
+  {
+    "name": "Juan Dela Cruz",
+    "age": 28,
+    "address": "123 Rizal Street, Manila",
+    "phone": "+639171234567",
+    "employmentStatus": "active",
+    "roleId": 1
+  },
+  {
+    "name": "Maria Santos",
+    "age": 28,
+    "address": "456 Quezon Avenue, Quezon City",
+    "phone": "+639281234567",
+    "employmentStatus": "active",
+    "roleId": 1
+  },
+  {
+    "name": "Jose Reyes",
+    "age": 28,
+    "address": "789 Makati Avenue, Makati",
+    "phone": "+639351234567",
+    "employmentStatus": "inactive",
+    "roleId": 1
+  },
+  {
+    "name": "Ana Garcia",
+    "age": 32,
+    "address": "321 Taft Avenue, Pasay",
+    "phone": "+639191234567",
+    "employmentStatus": "active",
+    "roleId": 2
+  },
+  {
+    "name": "Pedro Fernandez",
+    "age": 32,
+    "address": "654 España Boulevard, Sampaloc",
+    "phone": "+639201234567",
+    "employmentStatus": "active",
+    "roleId": 2
+  },
+  {
+    "name": "Sofia Martinez",
+    "age": 32,
+    "address": "987 Ortigas Avenue, Pasig",
+    "phone": "+639361234567",
+    "employmentStatus": "inactive",
+    "roleId": 2
+  },
+  {
+    "name": "Carlos Lim",
+    "age": 25,
+    "address": "147 Shaw Boulevard, Mandaluyong",
+    "phone": "+639181234567",
+    "employmentStatus": "active",
+    "roleId": 3
+  },
+  {
+    "name": "Isabel Tan",
+    "age": 25,
+    "address": "258 Marcos Highway, Marikina",
+    "phone": "+639291234567",
+    "employmentStatus": "active",
+    "roleId": 3
+  },
+  {
+    "name": "Miguel Ramos",
+    "age": 25,
+    "address": "369 Commonwealth Avenue, Quezon City",
+    "phone": "+639371234567",
+    "employmentStatus": "inactive",
+    "roleId": 3
+  },
+  {
+    "name": "Rosa Villanueva",
+    "age": 28,
+    "address": "741 Katipunan Avenue, Quezon City",
+    "phone": "+639221234567",
+    "employmentStatus": "active",
+    "roleId": 1
+  },
+  {
+    "name": "Antonio Cruz",
+    "age": 32,
+    "address": "852 Aurora Boulevard, Quezon City",
+    "phone": "+639331234567",
+    "employmentStatus": "inactive",
+    "roleId": 2
+  },
+  {
+    "name": "Elena Gonzales",
+    "age": 25,
+    "address": "963 Roxas Boulevard, Manila",
+    "phone": "+639241234567",
+    "employmentStatus": "active",
+    "roleId": 3
+  },
+  {
+    "name": "Roberto Silva",
+    "age": 28,
+    "address": "159 EDSA, Mandaluyong",
+    "phone": "+639151234567",
+    "employmentStatus": "inactive",
+    "roleId": 1
+  },
+  {
+    "name": "Carmen Reyes",
+    "age": 32,
+    "address": "357 Araneta Avenue, Quezon City",
+    "phone": "+639261234567",
+    "employmentStatus": "active",
+    "roleId": 2
+  },
+  {
+    "name": "Luis Mendoza",
+    "age": 25,
+    "address": "753 C5 Road, Taguig",
+    "phone": "+639381234567",
+    "employmentStatus": "inactive",
+    "roleId": 3
+  },
+  {
+    "name": "Patricia Aquino",
+    "age": 28,
+    "address": "951 Macapagal Avenue, Pasay",
+    "phone": "+639121234567",
+    "employmentStatus": "active",
+    "roleId": 1
+  },
+  {
+    "name": "Fernando Lopez",
+    "age": 32,
+    "address": "246 Gil Puyat Avenue, Makati",
+    "phone": "+639231234567",
+    "employmentStatus": "active",
+    "roleId": 2
+  },
+  {
+    "name": "Teresa Bautista",
+    "age": 25,
+    "address": "468 Marcos Highway, Antipolo",
+    "phone": "+639341234567",
+    "employmentStatus": "active",
+    "roleId": 3
+  },
+  {
+    "name": "Ricardo Torres",
+    "age": 28,
+    "address": "135 Banawe Street, Quezon City",
+    "phone": "+639251234567",
+    "employmentStatus": "inactive",
+    "roleId": 1
+  },
+  {
+    "name": "Angela Diaz",
+    "age": 32,
+    "address": "579 Alabang-Zapote Road, Las Piñas",
+    "phone": "+639161234567",
+    "employmentStatus": "inactive",
+    "roleId": 2
+  },
+  {
+    "name": "Manuel Castro",
+    "age": 25,
+    "address": "791 Bonifacio Global City, Taguig",
+    "phone": "+639271234567",
+    "employmentStatus": "active",
+    "roleId": 3
+  },
+  {
+    "name": "Gloria Navarro",
+    "age": 28,
+    "address": "864 Pasong Tamo Extension, Makati",
+    "phone": "+639391234567",
+    "employmentStatus": "active",
+    "roleId": 1
+  },
+  {
+    "name": "Emilio Ramos",
+    "age": 32,
+    "address": "246 Timog Avenue, Quezon City",
+    "phone": "+639131234567",
+    "employmentStatus": "active",
+    "roleId": 2
+  },
+  {
+    "name": "Victoria Santos",
+    "age": 25,
+    "address": "681 Morayta Street, Manila",
+    "phone": "+639211234567",
+    "employmentStatus": "inactive",
+    "roleId": 3
+  },
+  {
+    "name": "Rodrigo Flores",
+    "age": 28,
+    "address": "913 P. Burgos Street, Makati",
+    "phone": "+639321234567",
+    "employmentStatus": "active",
+    "roleId": 1
+  },
+  {
+    "name": "Beatriz Morales",
+    "age": 32,
+    "address": "428 Reposo Street, Manila",
+    "phone": "+639141234567",
+    "employmentStatus": "inactive",
+    "roleId": 2
+  },
+  {
+    "name": "Alfredo Jimenez",
+    "age": 25,
+    "address": "537 Jupiter Street, Makati",
+    "phone": "+639251234568",
+    "employmentStatus": "active",
+    "roleId": 3
+  },
+  {
+    "name": "Lucia Hernandez",
+    "age": 28,
+    "address": "642 Maginhawa Street, Quezon City",
+    "phone": "+639311234567",
+    "employmentStatus": "active",
+    "roleId": 1
+  },
+  {
+    "name": "Domingo Cortez",
+    "age": 32,
+    "address": "719 Osmeña Highway, Makati",
+    "phone": "+639231234568",
+    "employmentStatus": "active",
+    "roleId": 2
+  },
+  {
+    "name": "Cristina Valdez",
+    "age": 25,
+    "address": "826 Bayani Road, Taguig",
+    "phone": "+639171234568",
+    "employmentStatus": "inactive",
+    "roleId": 3
+  }
+]

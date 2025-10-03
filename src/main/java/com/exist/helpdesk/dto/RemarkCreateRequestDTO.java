@@ -7,7 +7,9 @@ import jakarta.validation.constraints.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class RoleCreateRequestDTO {
+public class RemarkCreateRequestDTO {
     @NotBlank
-    private String name;
+    private String remark;
+    @NotBlank
+    private String addedBy;
 }

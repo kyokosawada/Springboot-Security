@@ -1,9 +1,9 @@
 package com.exist.helpdesk.controller;
 import com.exist.helpdesk.dto.EmployeeCreateRequestDTO;
 import com.exist.helpdesk.dto.EmployeeUpdateRequestDTO;
-import com.exist.helpdesk.model.Employee;
 import com.exist.helpdesk.service.EmployeeService;
 import com.exist.helpdesk.dto.EmployeeResponseDTO;
+import com.exist.helpdesk.dto.PaginatedResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.http.ResponseEntity;
@@ -23,12 +23,23 @@ public class EmployeeController {
     }
 
     @GetMapping
-    public List<Employee> getAllEmployees() {
-        return employeeService.getAllEmployees();
+    public PaginatedResponse<EmployeeResponseDTO> getEmployees(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "4") int size,
+            @RequestParam(defaultValue = "id") String sortBy,
+            @RequestParam(defaultValue = "asc") String sortDir,
+            @RequestParam(required = false) String name,
+            @RequestParam(required = false) Integer age,
+            @RequestParam(required = false) String address,
+            @RequestParam(required = false) String phone,
+            @RequestParam(required = false) String employmentStatus,
+            @RequestParam(required = false) Long roleId
+    ) {
+        return employeeService.getEmployees(page, size, sortBy, sortDir, name, age, address, phone, employmentStatus, roleId);
     }
 
     @GetMapping("/{id}")
-    public Employee getEmployeeById(@PathVariable Long id) {
+    public EmployeeResponseDTO getEmployeeById(@PathVariable Long id) {
         return employeeService.getEmployeeById(id);
     }
 

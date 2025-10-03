@@ -5,8 +5,15 @@ import com.exist.helpdesk.model.Role;
 import com.exist.helpdesk.repository.RoleRepository;
 import com.exist.helpdesk.dto.RoleCreateRequestDTO;
 import com.exist.helpdesk.dto.RoleUpdateRequestDTO;
+import com.exist.helpdesk.mapper.RoleMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.beans.factory.annotation.Autowired;
+import com.exist.helpdesk.dto.PaginatedResponse;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 
 import java.util.List;
 
@@ -14,40 +21,60 @@ import java.util.List;
 public class RoleService {
 
     private final RoleRepository roleRepository;
+    private final RoleMapper roleMapper;
 
     @Autowired
-    public RoleService(RoleRepository roleRepository) {
+    public RoleService(RoleRepository roleRepository, RoleMapper roleMapper) {
         this.roleRepository = roleRepository;
+        this.roleMapper = roleMapper;
     }
 
     public List<RoleResponseDTO> getAllRoles() {
         List<Role> roles = roleRepository.findAll();
         return roles.stream()
-                .map(role -> new RoleResponseDTO(role.getId(), role.getName()))
+                .map(roleMapper::toResponse)
                 .toList();
     }
 
     public RoleResponseDTO getRoleById(Long id) {
         Role role = roleRepository.findById(id).orElse(null);
         if (role == null) return null;
-        return new RoleResponseDTO(role.getId(), role.getName());
+        return roleMapper.toResponse(role);
+    }
+
+    public PaginatedResponse<RoleResponseDTO> getRoles(int page, int size, String sortBy, String sortDir, String name) {
+        Sort sort = sortDir.equalsIgnoreCase("asc") ? Sort.by(sortBy).ascending() : Sort.by(sortBy).descending();
+        Pageable pageable = PageRequest.of(page, size, sort);
+        Specification<Role> spec = (root, query, cb) -> cb.conjunction();
+        if (name != null && !name.isBlank()) {
+            spec = spec.and((root, query, cb) -> cb.like(cb.lower(root.get("name")), "%" + name.toLowerCase() + "%"));
+        }
+        Page<Role> rolePage = roleRepository.findAll(spec, pageable);
+        List<RoleResponseDTO> content = rolePage.getContent().stream()
+                .map(roleMapper::toResponse)
+                .toList();
+        return PaginatedResponse.<RoleResponseDTO>builder()
+                .content(content)
+                .page(rolePage.getNumber())
+                .size(rolePage.getSize())
+                .totalElements(rolePage.getTotalElements())
+                .totalPages(rolePage.getTotalPages())
+                .last(rolePage.isLast())
+                .build();
     }
 
     public RoleResponseDTO createRole(RoleCreateRequestDTO request) {
-        Role role = new Role();
-        role.setName(request.getName());
-        role.setDescription(request.getDescription());
+        Role role = roleMapper.toEntity(request);
         Role saved = roleRepository.save(role);
-        return new RoleResponseDTO(saved.getId(), saved.getName());
+        return roleMapper.toResponse(saved);
     }
 
     public RoleResponseDTO updateRole(Long id, RoleUpdateRequestDTO request) {
         Role role = roleRepository.findById(id).orElse(null);
         if (role == null) return null;
-        if (request.getName() != null) role.setName(request.getName());
-        if (request.getDescription() != null) role.setDescription(request.getDescription());
+        roleMapper.updateRoleFromDto(request, role);
         Role saved = roleRepository.save(role);
-        return new RoleResponseDTO(saved.getId(), saved.getName());
+        return roleMapper.toResponse(saved);
     }
 
     public void deleteRole(Long id) {

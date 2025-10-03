@@ -4,6 +4,7 @@ import com.exist.helpdesk.service.RoleService;
 import com.exist.helpdesk.dto.RoleCreateRequestDTO;
 import com.exist.helpdesk.dto.RoleUpdateRequestDTO;
 import com.exist.helpdesk.dto.RoleResponseDTO;
+import com.exist.helpdesk.dto.PaginatedResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -20,8 +21,14 @@ public class RoleController {
     }
 
     @GetMapping
-    public List<RoleResponseDTO> getAllRoles() {
-        return roleService.getAllRoles();
+    public PaginatedResponse<RoleResponseDTO> getRoles(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "id") String sortBy,
+            @RequestParam(defaultValue = "asc") String sortDir,
+            @RequestParam(required = false) String name
+    ) {
+        return roleService.getRoles(page, size, sortBy, sortDir, name);
     }
 
     @GetMapping("/{id}")

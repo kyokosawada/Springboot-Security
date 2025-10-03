@@ -8,5 +8,4 @@ import lombok.*;
 @Builder
 public class RoleUpdateRequestDTO {
     private String name;
-    private String description;
 }

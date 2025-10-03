@@ -1,11 +1,11 @@
 package com.exist.helpdesk.controller;
 
-import com.exist.helpdesk.model.HelpdeskTicket;
+import com.exist.helpdesk.dto.*;
 import com.exist.helpdesk.service.HelpdeskTicketService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
+import org.springframework.http.ResponseEntity;
+import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/api/tickets")
@@ -17,28 +17,41 @@ public class HelpdeskTicketController {
         this.ticketService = ticketService;
     }
 
-    @GetMapping
-    public List<HelpdeskTicket> getAllTickets() {
-        return ticketService.getAllTickets();
-    }
-
-    @GetMapping("/{id}")
-    public HelpdeskTicket getTicketById(@PathVariable Long id) {
-        return ticketService.getTicketById(id);
-    }
-
     @PostMapping
-    public HelpdeskTicket createTicket(@RequestBody HelpdeskTicket ticket) {
-        return ticketService.createTicket(ticket);
+    public HelpdeskTicketResponseDTO createTicket(@Valid @RequestBody HelpdeskTicketCreateRequestDTO dto) {
+        return ticketService.createTicket(dto);
     }
 
     @PutMapping("/{id}")
-    public HelpdeskTicket updateTicket(@PathVariable Long id, @RequestBody HelpdeskTicket ticket) {
-        return ticketService.updateTicket(id, ticket);
+    public HelpdeskTicketResponseDTO updateTicket(@PathVariable Long id, @Valid @RequestBody HelpdeskTicketUpdateRequestDTO dto) {
+        return ticketService.updateTicket(id, dto);
+    }
+
+    @PatchMapping("/{id}/remarks")
+    public RemarkResponseDTO addRemark(@PathVariable Long id, @Valid @RequestBody RemarkCreateRequestDTO dto) {
+        return ticketService.addRemarkToTicket(id, dto);
+    }
+
+    @GetMapping
+    public PaginatedResponse<HelpdeskTicketResponseDTO> getTickets(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "4") int size,
+            @RequestParam(defaultValue = "ticketNumber") String sortBy,
+            @RequestParam(defaultValue = "asc") String sortDir,
+            @RequestParam(required = false) String status,
+            @RequestParam(required = false) Long assigneeId,
+            @RequestParam(required = false) Long createdById) {
+        return ticketService.getTickets(page, size, sortBy, sortDir, status, assigneeId, createdById);
+    }
+
+    @GetMapping("/{id}")
+    public HelpdeskTicketResponseDTO getTicketById(@PathVariable Long id) {
+        return ticketService.getTicketById(id);
     }
 
     @DeleteMapping("/{id}")
-    public void deleteTicket(@PathVariable Long id) {
+    public ResponseEntity<Void> deleteTicket(@PathVariable Long id) {
         ticketService.deleteTicket(id);
+        return ResponseEntity.noContent().build();
     }
 }
