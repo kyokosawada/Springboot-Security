@@ -17,6 +17,8 @@ import org.springframework.data.jpa.domain.Specification;
 
 import java.util.List;
 
+import com.exist.helpdesk.utils.PaginatedResponseUtil;
+
 @Service
 public class RoleService {
 
@@ -50,17 +52,8 @@ public class RoleService {
             spec = spec.and((root, query, cb) -> cb.like(cb.lower(root.get("name")), "%" + name.toLowerCase() + "%"));
         }
         Page<Role> rolePage = roleRepository.findAll(spec, pageable);
-        List<RoleResponseDTO> content = rolePage.getContent().stream()
-                .map(roleMapper::toResponse)
-                .toList();
-        return PaginatedResponse.<RoleResponseDTO>builder()
-                .content(content)
-                .page(rolePage.getNumber())
-                .size(rolePage.getSize())
-                .totalElements(rolePage.getTotalElements())
-                .totalPages(rolePage.getTotalPages())
-                .last(rolePage.isLast())
-                .build();
+        Page<RoleResponseDTO> dtoPage = rolePage.map(roleMapper::toResponse);
+        return PaginatedResponseUtil.fromPage(dtoPage);
     }
 
     public RoleResponseDTO createRole(RoleCreateRequestDTO request) {

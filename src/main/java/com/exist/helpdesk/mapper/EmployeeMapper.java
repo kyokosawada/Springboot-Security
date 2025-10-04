@@ -10,9 +10,10 @@ import org.mapstruct.BeanMapping;
 import org.mapstruct.MappingTarget;
 import org.mapstruct.NullValuePropertyMappingStrategy;
 
-@Mapper(componentModel = "spring", uses = RoleMapper.class)
+@Mapper(componentModel = "spring")
 public interface EmployeeMapper {
-    Employee toEntity(EmployeeCreateRequestDTO request);
+
+    Employee toEntity(EmployeeCreateRequestDTO dto);
 
     EmployeeResponseDTO toResponse(Employee employee);
 

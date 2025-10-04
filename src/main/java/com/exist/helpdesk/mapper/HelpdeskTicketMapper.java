@@ -13,17 +13,17 @@ import java.util.List;
 @Mapper(componentModel = "spring")
 public interface HelpdeskTicketMapper {
 
-    @Mapping(target = "id", ignore = true)
-    HelpdeskTicket toEntity(HelpdeskTicketCreateRequestDTO dto, Employee assignee);
+    @Mapping(target = "createdBy", source = "name")
+    @Mapping(target = "updatedBy", source = "name")
+    HelpdeskTicket toEntity(HelpdeskTicketCreateRequestDTO dto);
 
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
-    void updateEntityFromDto(HelpdeskTicketUpdateRequestDTO dto, @MappingTarget HelpdeskTicket entity, @Context Employee assignee);
+    void updateEntityFromDto(HelpdeskTicketUpdateRequestDTO dto, @MappingTarget HelpdeskTicket entity);
 
     @Mapping(target = "assigneeId", source = "assignee.id")
     HelpdeskTicketResponseDTO toResponse(HelpdeskTicket ticket);
 
-    @Mapping(target = "addedAt", expression = "java(now)")
-    Remark toEntity(RemarkCreateRequestDTO dto, @Context LocalDateTime now);
+    Remark toEntity(RemarkCreateRequestDTO dto);
 
     RemarkResponseDTO remarkToDto(Remark remark);
 

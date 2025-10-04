@@ -15,6 +15,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
+import com.exist.helpdesk.utils.PaginatedResponseUtil;
 
 import java.util.List;
 import java.util.ArrayList;
@@ -61,17 +62,8 @@ public class EmployeeService {
                 .reduce(Specification::and)
                 .orElse((root, query, cb) -> cb.conjunction());
         Page<Employee> employeePage = employeeRepository.findAll(spec, pageable);
-        List<EmployeeResponseDTO> content = employeePage.getContent().stream()
-                .map(employeeMapper::toResponse)
-                .toList();
-        return PaginatedResponse.<EmployeeResponseDTO>builder()
-                .content(content)
-                .page(employeePage.getNumber())
-                .size(employeePage.getSize())
-                .totalElements(employeePage.getTotalElements())
-                .totalPages(employeePage.getTotalPages())
-                .last(employeePage.isLast())
-                .build();
+        Page<EmployeeResponseDTO> dtoPage = employeePage.map(employeeMapper::toResponse);
+        return PaginatedResponseUtil.fromPage(dtoPage);
     }
 
     public EmployeeResponseDTO getEmployeeById(Long id) {
@@ -83,11 +75,10 @@ public class EmployeeService {
         return employeeRepository.findById(id).orElseThrow();
     }
 
-    public EmployeeResponseDTO createEmployee(EmployeeCreateRequestDTO request) {
-        Role role = roleService.getRoleEntityById(request.getRoleId());
-        Employee employee = employeeMapper.toEntity(request);
+    public EmployeeResponseDTO createEmployee(EmployeeCreateRequestDTO dto) {
+        Employee employee = employeeMapper.toEntity(dto);
+        Role role = roleService.getRoleEntityById(dto.getRoleId());
         employee.setRole(role);
-
         Employee saved = employeeRepository.save(employee);
         return employeeMapper.toResponse(saved);
     }
@@ -97,7 +88,8 @@ public class EmployeeService {
         if (emp == null) return null;
         employeeMapper.updateEmployeeFromDto(request, emp);
         if (request.getRoleId() != null) {
-            emp.setRole(roleService.getRoleEntityById(request.getRoleId()));
+            Role role = roleService.getRoleEntityById(request.getRoleId());
+            emp.setRole(role);
         }
         Employee saved = employeeRepository.save(emp);
         return employeeMapper.toResponse(saved);

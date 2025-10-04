@@ -11,4 +11,5 @@ public class HelpdeskTicketUpdateRequestDTO {
     private String body;
     private String status;
     private Long assigneeId;
+    private String updatedBy;
 }

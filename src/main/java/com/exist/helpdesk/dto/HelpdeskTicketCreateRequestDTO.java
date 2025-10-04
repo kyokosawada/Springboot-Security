@@ -12,6 +12,9 @@ public class HelpdeskTicketCreateRequestDTO {
     private String title;
 
     @NotBlank
+    private String name;
+
+    @NotBlank
     private String body;
 
     @NotNull

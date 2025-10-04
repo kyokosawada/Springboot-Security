@@ -16,6 +16,8 @@ import java.util.List;
 import java.util.ArrayList;
 import java.util.UUID;
 
+import com.exist.helpdesk.utils.PaginatedResponseUtil;
+
 @Service
 public class HelpdeskTicketService {
     private final HelpdeskTicketRepository ticketRepository;
@@ -31,9 +33,10 @@ public class HelpdeskTicketService {
 
 
     public HelpdeskTicketResponseDTO createTicket(HelpdeskTicketCreateRequestDTO dto) {
-        Employee assignee = employeeService.getEmployeeEntityById(dto.getAssigneeId());
-        HelpdeskTicket ticket = ticketMapper.toEntity(dto, assignee);
+        HelpdeskTicket ticket = ticketMapper.toEntity(dto);
+        ticket.setAssignee(employeeService.getEmployeeEntityById(dto.getAssigneeId()));
         ticket.setCreatedDate(LocalDateTime.now());
+        ticket.setUpdatedDate(LocalDateTime.now());
         ticket.setStatus((dto.getFiled() != null && !dto.getFiled()) ? "draft" : "filed");
         ticket.setRemarks(new ArrayList<>());
         ticket.setTicketNumber("EXIST-" + UUID.randomUUID().toString().substring(0, 8).toUpperCase());
@@ -43,8 +46,10 @@ public class HelpdeskTicketService {
 
     public HelpdeskTicketResponseDTO updateTicket(Long id, HelpdeskTicketUpdateRequestDTO dto) {
         HelpdeskTicket ticket = ticketRepository.findById(id).orElseThrow();
-        Employee assignee = dto.getAssigneeId() != null ? employeeService.getEmployeeEntityById(dto.getAssigneeId()) : null;
-        ticketMapper.updateEntityFromDto(dto, ticket, assignee);
+        ticketMapper.updateEntityFromDto(dto, ticket);
+        if (dto.getAssigneeId() != null) {
+            ticket.setAssignee(employeeService.getEmployeeEntityById(dto.getAssigneeId()));
+        }
         ticket.setUpdatedDate(LocalDateTime.now());
         HelpdeskTicket saved = ticketRepository.save(ticket);
         return ticketMapper.toResponse(saved);
@@ -65,15 +70,8 @@ public class HelpdeskTicketService {
                 .orElse((root, query, cb) -> cb.conjunction());
 
         Page<HelpdeskTicket> pageResult = ticketRepository.findAll(spec, pageable);
-        List<HelpdeskTicketResponseDTO> content = pageResult.getContent().stream().map(ticketMapper::toResponse).toList();
-        return PaginatedResponse.<HelpdeskTicketResponseDTO>builder()
-                .content(content)
-                .page(pageResult.getNumber())
-                .size(pageResult.getSize())
-                .totalElements(pageResult.getTotalElements())
-                .totalPages(pageResult.getTotalPages())
-                .last(pageResult.isLast())
-                .build();
+        Page<HelpdeskTicketResponseDTO> dtoPage = pageResult.map(ticketMapper::toResponse);
+        return PaginatedResponseUtil.fromPage(dtoPage);
     }
 
     public HelpdeskTicketResponseDTO getTicketById(Long id) {
@@ -87,13 +85,12 @@ public class HelpdeskTicketService {
 
     public RemarkResponseDTO addRemarkToTicket(Long ticketId, RemarkCreateRequestDTO dto) {
         HelpdeskTicket ticket = ticketRepository.findById(ticketId).orElseThrow();
-        Remark remark = ticketMapper.toEntity(dto, LocalDateTime.now());
+        Remark remark = ticketMapper.toEntity(dto);
+        remark.setAddedAt(LocalDateTime.now());
         ticket.getRemarks().add(remark);
         ticket.setUpdatedDate(LocalDateTime.now());
         ticketRepository.save(ticket);
         return ticketMapper.remarkToDto(remark);
-
-
     }
 
 

@@ -1,0 +1,37 @@
+[
+  {
+    "title": "Password Reset Request",
+    "body": "User cannot log in due to forgotten password. Please assist.",
+    "assigneeId": 1,
+    "filed": true,
+    "name": "Alice Smith"
+  },
+  {
+    "title": "Email Service Down",
+    "body": "The company email service is currently unreachable since 9 AM today.",
+    "assigneeId": 2,
+    "filed": true,
+    "name": "Bob Johnson"
+  },
+  {
+    "title": "New Laptop Provision",
+    "body": "Please provide a new laptop for the new hire starting next week.",
+    "assigneeId": 3,
+    "filed": false,
+    "name": "Carol Lee"
+  },
+  {
+    "title": "VPN Access Issue",
+    "body": "Remote employees are unable to connect to the company VPN.",
+    "assigneeId": 4,
+    "filed": true,
+    "name": "David Kim"
+  },
+  {
+    "title": "Software License Renewal",
+    "body": "Renew licenses for development team tools before next quarter.",
+    "assigneeId": 5,
+    "filed": false,
+    "name": "Evelyn Torres"
+  }
+]
