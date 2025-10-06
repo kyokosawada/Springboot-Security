@@ -1,9 +1,9 @@
 package com.exist.helpdesk.service;
 
 import com.exist.helpdesk.dto.*;
+import com.exist.helpdesk.dto.helpdeskticket.*;
 import com.exist.helpdesk.mapper.HelpdeskTicketMapper;
 import com.exist.helpdesk.model.HelpdeskTicket;
-import com.exist.helpdesk.model.Employee;
 import com.exist.helpdesk.model.Remark;
 import com.exist.helpdesk.repository.HelpdeskTicketRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,6 +15,8 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.UUID;
+
+import com.exist.helpdesk.exception.ResourceNotFoundException;
 
 import com.exist.helpdesk.utils.PaginatedResponseUtil;
 
@@ -45,7 +47,8 @@ public class HelpdeskTicketService {
     }
 
     public HelpdeskTicketResponseDTO updateTicket(Long id, HelpdeskTicketUpdateRequestDTO dto) {
-        HelpdeskTicket ticket = ticketRepository.findById(id).orElseThrow();
+        HelpdeskTicket ticket = ticketRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Ticket with id " + id + " not found"));
         ticketMapper.updateEntityFromDto(dto, ticket);
         if (dto.getAssigneeId() != null) {
             ticket.setAssignee(employeeService.getEmployeeEntityById(dto.getAssigneeId()));
@@ -75,16 +78,21 @@ public class HelpdeskTicketService {
     }
 
     public HelpdeskTicketResponseDTO getTicketById(Long id) {
-        HelpdeskTicket ticket = ticketRepository.findById(id).orElseThrow();
+        HelpdeskTicket ticket = ticketRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Ticket with id " + id + " not found"));
         return ticketMapper.toResponse(ticket);
     }
 
     public void deleteTicket(Long id) {
+        if (!ticketRepository.existsById(id)) {
+            throw new ResourceNotFoundException("Ticket with id " + id + " not found");
+        }
         ticketRepository.deleteById(id);
     }
 
     public RemarkResponseDTO addRemarkToTicket(Long ticketId, RemarkCreateRequestDTO dto) {
-        HelpdeskTicket ticket = ticketRepository.findById(ticketId).orElseThrow();
+        HelpdeskTicket ticket = ticketRepository.findById(ticketId)
+                .orElseThrow(() -> new ResourceNotFoundException("Ticket with id " + ticketId + " not found"));
         Remark remark = ticketMapper.toEntity(dto);
         remark.setAddedAt(LocalDateTime.now());
         ticket.getRemarks().add(remark);

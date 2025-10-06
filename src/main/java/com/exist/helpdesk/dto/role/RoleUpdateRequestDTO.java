@@ -1,4 +1,4 @@
-package com.exist.helpdesk.dto;
+package com.exist.helpdesk.dto.role;
 
 import lombok.*;
 

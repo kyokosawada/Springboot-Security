@@ -1,14 +1,12 @@
 package com.exist.helpdesk.controller;
-import com.exist.helpdesk.dto.EmployeeCreateRequestDTO;
-import com.exist.helpdesk.dto.EmployeeUpdateRequestDTO;
+import com.exist.helpdesk.dto.employee.EmployeeCreateRequestDTO;
+import com.exist.helpdesk.dto.employee.EmployeeUpdateRequestDTO;
 import com.exist.helpdesk.service.EmployeeService;
-import com.exist.helpdesk.dto.EmployeeResponseDTO;
+import com.exist.helpdesk.dto.employee.EmployeeResponseDTO;
 import com.exist.helpdesk.dto.PaginatedResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.http.ResponseEntity;
-
-import java.util.List;
 
 import jakarta.validation.Valid;
 
@@ -62,9 +60,6 @@ public class EmployeeController {
     public ResponseEntity<EmployeeResponseDTO> assignRoleToEmployee(
             @PathVariable Long id, @PathVariable Long roleId) {
         EmployeeResponseDTO dto = employeeService.assignRoleToEmployee(id, roleId);
-        if (dto == null) {
-            return ResponseEntity.notFound().build();
-        }
         return ResponseEntity.ok(dto);
     }
 }

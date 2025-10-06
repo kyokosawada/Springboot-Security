@@ -1,14 +1,12 @@
 package com.exist.helpdesk.controller;
 
 import com.exist.helpdesk.service.RoleService;
-import com.exist.helpdesk.dto.RoleCreateRequestDTO;
-import com.exist.helpdesk.dto.RoleUpdateRequestDTO;
-import com.exist.helpdesk.dto.RoleResponseDTO;
+import com.exist.helpdesk.dto.role.RoleCreateRequestDTO;
+import com.exist.helpdesk.dto.role.RoleUpdateRequestDTO;
+import com.exist.helpdesk.dto.role.RoleResponseDTO;
 import com.exist.helpdesk.dto.PaginatedResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/roles")

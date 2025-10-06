@@ -1,5 +1,6 @@
-package com.exist.helpdesk.dto;
+package com.exist.helpdesk.dto.employee;
 
+import com.exist.helpdesk.dto.role.RoleResponseDTO;
 import lombok.*;
 
 @Data

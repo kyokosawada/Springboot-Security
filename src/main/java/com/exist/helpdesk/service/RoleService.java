@@ -1,10 +1,10 @@
 package com.exist.helpdesk.service;
 
-import com.exist.helpdesk.dto.RoleResponseDTO;
+import com.exist.helpdesk.dto.role.RoleResponseDTO;
 import com.exist.helpdesk.model.Role;
 import com.exist.helpdesk.repository.RoleRepository;
-import com.exist.helpdesk.dto.RoleCreateRequestDTO;
-import com.exist.helpdesk.dto.RoleUpdateRequestDTO;
+import com.exist.helpdesk.dto.role.RoleCreateRequestDTO;
+import com.exist.helpdesk.dto.role.RoleUpdateRequestDTO;
 import com.exist.helpdesk.mapper.RoleMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,6 +18,7 @@ import org.springframework.data.jpa.domain.Specification;
 import java.util.List;
 
 import com.exist.helpdesk.utils.PaginatedResponseUtil;
+import com.exist.helpdesk.exception.ResourceNotFoundException;
 
 @Service
 public class RoleService {
@@ -39,8 +40,8 @@ public class RoleService {
     }
 
     public RoleResponseDTO getRoleById(Long id) {
-        Role role = roleRepository.findById(id).orElse(null);
-        if (role == null) return null;
+        Role role = roleRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Role with id " + id + " not found"));
         return roleMapper.toResponse(role);
     }
 
@@ -63,8 +64,8 @@ public class RoleService {
     }
 
     public RoleResponseDTO updateRole(Long id, RoleUpdateRequestDTO request) {
-        Role role = roleRepository.findById(id).orElse(null);
-        if (role == null) return null;
+        Role role = roleRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Role with id " + id + " not found"));
         roleMapper.updateRoleFromDto(request, role);
         Role saved = roleRepository.save(role);
         return roleMapper.toResponse(saved);
@@ -75,6 +76,7 @@ public class RoleService {
     }
 
     public Role getRoleEntityById(Long id) {
-        return roleRepository.findById(id).orElse(null);
+        return roleRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Role with id " + id + " not found"));
     }
 }

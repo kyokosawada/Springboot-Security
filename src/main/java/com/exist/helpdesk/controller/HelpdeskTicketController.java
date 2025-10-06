@@ -1,6 +1,7 @@
 package com.exist.helpdesk.controller;
 
 import com.exist.helpdesk.dto.*;
+import com.exist.helpdesk.dto.helpdeskticket.*;
 import com.exist.helpdesk.service.HelpdeskTicketService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;

@@ -1,8 +1,8 @@
 package com.exist.helpdesk.mapper;
 
-import com.exist.helpdesk.dto.RoleCreateRequestDTO;
-import com.exist.helpdesk.dto.RoleUpdateRequestDTO;
-import com.exist.helpdesk.dto.RoleResponseDTO;
+import com.exist.helpdesk.dto.role.RoleCreateRequestDTO;
+import com.exist.helpdesk.dto.role.RoleUpdateRequestDTO;
+import com.exist.helpdesk.dto.role.RoleResponseDTO;
 import com.exist.helpdesk.model.Role;
 import org.mapstruct.BeanMapping;
 import org.mapstruct.Mapper;

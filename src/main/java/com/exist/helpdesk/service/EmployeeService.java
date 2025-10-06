@@ -1,11 +1,11 @@
 package com.exist.helpdesk.service;
 
-import com.exist.helpdesk.dto.EmployeeResponseDTO;
+import com.exist.helpdesk.dto.employee.EmployeeResponseDTO;
 import com.exist.helpdesk.model.Employee;
 import com.exist.helpdesk.repository.EmployeeRepository;
 import com.exist.helpdesk.model.Role;
-import com.exist.helpdesk.dto.EmployeeCreateRequestDTO;
-import com.exist.helpdesk.dto.EmployeeUpdateRequestDTO;
+import com.exist.helpdesk.dto.employee.EmployeeCreateRequestDTO;
+import com.exist.helpdesk.dto.employee.EmployeeUpdateRequestDTO;
 import com.exist.helpdesk.mapper.EmployeeMapper;
 import com.exist.helpdesk.dto.PaginatedResponse;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,6 +19,9 @@ import com.exist.helpdesk.utils.PaginatedResponseUtil;
 
 import java.util.List;
 import java.util.ArrayList;
+
+import com.exist.helpdesk.exception.ResourceNotFoundException;
+import com.exist.helpdesk.exception.BadRequestException;
 
 @Service
 public class EmployeeService {
@@ -67,12 +70,14 @@ public class EmployeeService {
     }
 
     public EmployeeResponseDTO getEmployeeById(Long id) {
-        Employee employee = employeeRepository.findById(id).orElse(null);
-        return employee == null ? null : employeeMapper.toResponse(employee);
+        Employee employee = employeeRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Employee with id " + id + " not found"));
+        return employeeMapper.toResponse(employee);
     }
 
     public Employee getEmployeeEntityById(Long id) {
-        return employeeRepository.findById(id).orElseThrow();
+        return employeeRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Employee with id " + id + " not found"));
     }
 
     public EmployeeResponseDTO createEmployee(EmployeeCreateRequestDTO dto) {
@@ -84,8 +89,8 @@ public class EmployeeService {
     }
 
     public EmployeeResponseDTO updateEmployee(Long id, EmployeeUpdateRequestDTO request) {
-        Employee emp = employeeRepository.findById(id).orElse(null);
-        if (emp == null) return null;
+        Employee emp = employeeRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Employee with id " + id + " not found"));
         employeeMapper.updateEmployeeFromDto(request, emp);
         if (request.getRoleId() != null) {
             Role role = roleService.getRoleEntityById(request.getRoleId());
@@ -100,10 +105,9 @@ public class EmployeeService {
     }
 
     public EmployeeResponseDTO assignRoleToEmployee(Long empId, Long roleId) {
-        Employee emp = employeeRepository.findById(empId).orElse(null);
-        if (emp == null) return null;
+        Employee emp = employeeRepository.findById(empId)
+                .orElseThrow(() -> new ResourceNotFoundException("Employee with id " + empId + " not found"));
         Role role = roleService.getRoleEntityById(roleId);
-        if (role == null) return null;
         emp.setRole(role);
         Employee saved = employeeRepository.save(emp);
         return employeeMapper.toResponse(saved);

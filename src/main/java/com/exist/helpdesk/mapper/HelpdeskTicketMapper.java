@@ -1,12 +1,9 @@
 package com.exist.helpdesk.mapper;
 
-import com.exist.helpdesk.dto.*;
+import com.exist.helpdesk.dto.helpdeskticket.*;
 import com.exist.helpdesk.model.HelpdeskTicket;
-import com.exist.helpdesk.model.Employee;
 import com.exist.helpdesk.model.Remark;
 import org.mapstruct.*;
-import org.mapstruct.factory.Mappers;
-import java.time.LocalDateTime;
 
 import java.util.List;
 
