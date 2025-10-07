@@ -1,16 +1,11 @@
 package com.exist.helpdesk.dto.employee;
 
-import lombok.*;
-
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
-@Builder
-public class EmployeeUpdateRequestDTO {
-    private String name;
-    private Integer age;
-    private String address;
-    private String phone;
-    private String employmentStatus;
-    private Long roleId;
+public record EmployeeUpdateRequestDTO(
+        String name,
+        Integer age,
+        String address,
+        String phone,
+        String employmentStatus,
+        Long roleId
+) {
 }

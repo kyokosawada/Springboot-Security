@@ -22,87 +22,160 @@
 
 ### 1. Introduction to Spring Boot
 
-#### What is Spring Boot?
+#### What is Spring Boot? (2025 Edition)
 
-Spring Boot is an open-source framework by Pivotal (now VMware Tanzu) that enables rapid, convention-over-configuration
-development for stand-alone, production-grade applications based on the Spring ecosystem. Spring Boot streamlines
-working with Spring, providing sensible defaults, embedded servers, and dramatically reducing boilerplate code.
+Spring Boot 3.5+ is the modern, leading framework for building production-grade, enterprise Java applications. Created
+by Pivotal (now VMware Tanzu/Broadcom), it delivers rapid development and operational maturity, synthesizing the best of
+the Spring ecosystem for cloud-first, container-native, and microservices architectures.
 
-- **Primary Goals:**
-    - Eliminate boilerplate code and configuration
-    - Provide production-ready features (metrics, health checks, externalized config)
-    - Reduce time to deploy and iterate for both monolith and microservice architectures
+**Key Baseline (2025):**
 
-#### Why Spring Boot over Spring Framework?
+- **Requires:** Java 21+ (LTS)
+- **Enterprise APIs:** Full migration to **Jakarta EE 10/11** (no javax.*, now jakarta.*)
+- **Spring Boot 3.5** is the latest stable, last 3.x—focusing on cloud-native, modern concurrency, and operational
+  excellence.
 
-Spring Framework was historically powerful yet configuration-heavy. Spring Boot abstracts the best practices and
-configuration, auto-wiring the most likely setups and allowing deep customization only when necessary.
+**Main Value Proposition:**
 
-- **Spring (core) is** … a toolbox for dependency injection and infrastructure wiring.
-- **Spring Boot is** … a pre-configured, ready-to-go package that lets you get productive fast, while still letting you
-  drop into the toolbox when you need more control.
+- **Convention-over-configuration:** Sensible defaults, industry patterns, and auto-configuration means less “yak
+  shaving”, more business velocity.
+- **Embedded servers:** (Tomcat, Jetty, Undertow 2025) out-of-the-box, optimized for Docker/Kubernetes.
+- **Production ready at install:** Actuator, metrics, health, and security all included & ready for enterprise ops from
+  the start.
+- **Cloud-native focus:** Out-of-the-box compatibility with container platforms, Kubernetes, cloud config, and modern
+  deployment pipelines (Docker image builds, SBOM, etc).
+- **Zero-trust, industry-grade security:** Deep integration with Spring Security 6+ and OAuth2/JWT flows as first-class
+  patterns.
 
-**Spring Boot advantages:**
+---
 
-- Reduced configuration. Most dependencies work “out of the box.”
-- Embedded servers (Tomcat, Jetty, Undertow): no need to deploy WARs separately.
-- Wide community and rich third-party starter support.
-- Vast ecosystem: cloud, data, reactive, integration, messaging, and observability.
-- Best for both learning and building quick MVPs and enterprise-scale microservices.
-- Automatic health checks, metrics, and actuator endpoints for monitoring.
+#### Spring Boot Evolution and Why It Matters Now (2025)
 
-**Drawbacks:**
+- **Boot 1.x–2.x:** Reduced boilerplate, popularized embedded servers and starter-deps.
+- **Boot 3.x (2022–2025):**
+  - **Java 17+ baseline**; Java 21+ as the de facto minimum for new projects
+  - **Full Jakarta EE packages:** (breaking, but future-proof)
+  - **Reactive, native, and cloud-native compatibility**
+  - **Virtual threads, modularity, and native executables**
+  - **Growing integration with Kubernetes, distributed tracing, config layering
+  - **Release cadence:** Fast minor, ~1 major per 12–18 months; always target latest 3.x for new enterprise builds
 
-- Heavier abstraction: sometimes difficult to understand what defaults are being applied.
-- Upgrades require keeping up with fast Spring release cycles (especially with 3.x+).
-- Not always suited for super-lightweight REST-only APIs (can consider Quarkus, Micronaut, etc. if that is a concern).
+---
 
-#### Usage Scenarios
+#### Enterprise-Ready Concurrency: Project Loom & Virtual Threads
 
-- Microservices backends
-- REST APIs
-- Event-driven and messaging systems
-- Monolith to microservice decompositions
-- Cloud-native apps (Spring Cloud, Kubernetes)
-- Batch processing, data pipelines
+- **Spring Boot 3.2+ fully supports Java 21 virtual threads.**
+  - Enables ultra-light, blocking-friendly, highly concurrent web APIs and backends
+  - **How to enable:**
+    ```properties
+    spring.threads.virtual.enabled=true
+    ```
+  - **Best For:** Heavy IO, REST APIs, web apps—huge scalability at JVM efficiency
+  - **Gotchas:** Less benefit for CPU-bound or legacy JDBC (check pinning)
+  - **2025 Default:** Most new enterprise APIs should prefer virtual threads (Loom) unless deep, known reason otherwise
 
-#### Spring Boot Evolution & Modern Relevance (2025)
+---
 
-- **Initial Release:** 2014 (Spring Boot 1.0)
-- **Spring Boot 2.x:** Focused on Java 8/11, major auto-configuration and actuator boosts.
-- **Spring Boot 3.x+ (2022–2025):**
-    - Requires Java 17+ (Java 21 highly recommended)
-    - Migrated to Jakarta EE 9+ (package change from `javax.` to `jakarta.`)
-    - Supports cloud-native, reactive, and container-first architectures
-    - Key features: improved native compilation support, virtual threads, better security integration (Spring Security
-      6+), new RestClient, HTTP interface clients, enhanced Actuator endpoints, support for Project Loom, records for
-      DTOs, and more
-    - Growing support for Kubernetes, distributed tracing (Micrometer, OpenTelemetry)
-- **Release cadence:** Major release every 12–18 months, regular minor/bugfix updates
+#### GraalVM Native Images & Project CRaC: Startup/Mem Game-Changers
 
-#### Compatibility & The Java Ecosystem
+- **GraalVM native image:** Compile Spring Boot to a small, blazing-fast binary. Huge win for serverless, cloud.
+  - **Command:**
+    ```
+    ./mvnw -Pnative native:compile
+    ```
+  - **Benefit:** ~50ms startup, ~80% lower memory for most services; AOT safe; fits K8s/serverless
+  - **Limitations:** Some frameworks/extensions may require special config/hints
+- **CRaC (Coordinated Restore at Checkpoint):** For JVM-mode apps, pause & snapshot warm state, restore instantly (esp.
+  for "scale to zero"). Linux only.
+- **When to use each:** Native image for lowest mem/colocated cloud, CRaC for advanced JVM workloads needing near-zero
+  cold-start but JIT power.
 
-- **Required:** Java 17+ (Java 21 recommended for full modern feature set)
-- JVMs: Compatible with OpenJDK, Oracle JDK, GraalVM (native executables)
-- IDEs: IntelliJ IDEA, Eclipse, VS Code (Spring Tools), NetBeans
+---
 
-#### Interview & Mastery Notes
+#### Modern Observability, Tracing & Structured Logging
 
-- Be able to articulate the difference between Spring, Spring Boot, and other Java frameworks
-- Know why we use embedded servers (vs. deploying WARs)
-- Understand the implications of auto-configuration and when to override it
-- Be able to describe the migration path to Spring Boot 3.x from 2.x (Jakarta EE changes, minimum Java version)
-- Be familiar with the new features in 3.x/3.2/3.5 series (e.g. virtual threads, RestClient, records, security)
-- Common interview question: "How does Spring Boot simplify the configuration of a Spring application?"
-- Know pitfalls around version mismatches and updates, especially with breaking changes in the dependency tree
+- **Actuator, Micrometer, OpenTelemetry**: Standard for all cloud/ops metrics and traces
+  - Default endpoints: `/actuator/health`, `/actuator/metrics`, `/actuator/traces`, etc.
+  - Built-in structured logging: output in JSON, ECS, etc., suitable for ELK/Prometheus/Grafana
+    ```properties
+    logging.structured.format.console=ecs
+    ```
+  - **Trace IDs**: Auto added to logs/HTTP responses (`X-Trace-Id`)
+  - Exporters: Prometheus, OTLP, others out-of-the-box
+- **2025 Practice:** Apps should implement zero-config distributed tracing, expose liveness/readiness for K8s, and
+  enable structured logs for AIOps/data lakes
 
-#### Further Reading / Practice:
+---
 
-- [Spring Boot Official Documentation](https://spring.io/projects/spring-boot)
-- [Evolution of Spring Boot](https://www.baeldung.com/spring-boot)
-- [Spring Initializr](https://start.spring.io/)
-- [roadmap.sh/spring-boot](https://roadmap.sh/spring-boot)
-- [Spring Boot 3 Migration Guide](https://docs.spring.io/spring-boot/docs/current/reference/htmlsingle/#migration)
+#### Configuration Advances: Layering, Profiles, Cloud-Native Patterns
+
+- **Env Var & JSON Loading:** Overlays, deep config from environment vars or `SPRING_APPLICATION_JSON`
+- **Profile and Cloud Config:** Per-environment property files (`application-prod.yml`), and centralized config using
+  Spring Cloud Config
+- **2025 Pattern:** Secure secrets via env/config server; document overlays & order of precedence
+- **SBOM:** (Software Bill of Materials) automatically produced for transparency, security
+
+---
+
+#### Fully Jakarta EE: Modern APIs and Migration
+
+- **Migration:** app code, APIs, and libraries now _require_ `jakarta.*` imports and Jakarta EE 10/11 capabilities
+- **Consequence:** Legacy Java EE (javax) not supported. All persistence, REST, validation, etc., now Jakarta APIs.
+- **Upgrade path:** Use Spring Boot and library migration guides for 2.x to 3.5+.
+
+---
+
+#### Operational Excellence: K8s-Ready, DevOps-First
+
+- **Cloud-native core:** Embedded servers optimized for container platforms (Tomcat/Jetty/Undertow)
+- **Readiness/liveness probes:** `/actuator/health/liveness`, `/actuator/health/readiness` endpoints natively exportable
+  to K8s
+- **Secrets & config:** support Docker secrets, config maps, Vault, etc.
+- **Native Docker builds:** via Buildpacks and plugins, official multi-arch support
+- **Testcontainers:** First-class support for true production-like testing using Docker
+- **SBOM, supply chain:** Secure, auditable dependencies out-of-the-box
+
+---
+
+#### Modular Monoliths, Microservices, and Modern Architectures
+
+- **Prefer modular monolith for simple domains; microservices for scale/independent deploys.** Both can be built with
+  Boot/K8s if engineered with clear boundaries.
+- **Project, package, and module structure:** strongly encouraged to use feature/domain-driven design (not strict
+  layering)
+- **2025 Best Practices:**
+  - Modular codebase, domain/feature packaging
+  - Strong separation of concerns, documented public interfaces
+  - Container or K8s-first operationalization
+
+---
+
+#### Mastery/Interview Notes (2025)
+
+- Why Java 21+ and Jakarta EE 10/11 are now required? What are the most common migration pitfalls/trade-offs?
+- Virtual threads (Loom): How are they different from regular threads, and how do you enable/configure them in Spring
+  Boot?
+- Native images vs CRaC vs JIT: When do you use each, and what are the practical enterprise implications?
+- How does Spring Boot structure support true cloud-native ops (actuator, health, structured logging, SBOM, Docker/K8s
+  tests)?
+- What’s new in metrics, distributed tracing, and logging (Micrometer, OTel, zero-config)?
+- What are the core differences between modular monolith vs microservice in 2025 Boot, and how do you architect both?
+- Security: How does Boot 3.5+ enable Zero Trust, OAuth2/JWT, and role- or attribute-based controls by default?
+- Configuration layering: What is the order of precedence, and how do you handle multi-layered cloud config?
+
+---
+
+#### Further Reading / Practice (2025)
+
+- [Spring Boot 3.5 Documentation](https://docs.spring.io/spring-boot/docs/current/reference/html/)
+- [Release Notes & Migration Guides](https://github.com/spring-projects/spring-boot/wiki/Spring-Boot-3.5-Release-Notes)
+- [Spring Boot Docker/K8s Reference](https://spring.io/guides/gs/spring-boot-docker)
+- [Observability with Micrometer and OTel](https://micrometer.io/)
+- [K8s Health Probes](https://docs.spring.io/spring-boot/docs/current/reference/html/actuator.html#actuator.endpoints.health)
+- [Virtual threads/project Loom](https://openjdk.org/projects/loom/)
+- [GraalVM Native Image](https://www.graalvm.org/reference-manual/native-image/)
+- [Structured Logging Formats](https://www.elastic.co/guide/en/ecs/current/ecs-reference.html)
+- [Modern Testing: Testcontainers](https://www.testcontainers.com/)
 
 ### 2. Setting Up a Spring Boot Application
 
@@ -257,7 +330,477 @@ dependencies {
 
 ---
 
-### 3. Spring Boot Core Concepts
+### 3. Inversion of Control (IoC) in Spring Boot
+
+#### What is Inversion of Control (IoC)?
+
+- **Inversion of Control (IoC)** is a design principle at the heart of all modern Spring Boot development. IoC flips the
+  traditional idea of "I make all the objects I need myself" on its head—instead, you let the framework create, manage,
+  configure, and inject objects (“beans”) into your code.
+- Instead of your app’s classes being in control of how dependencies are constructed or configured, **you give that
+  control to the "Spring IoC container."**
+- You describe what you want (using annotations like `@Component`, `@Service`, `@Repository`, etc.), and Spring creates
+  the instances, sets up their dependencies, manages their lifecycle, and injects them where needed.
+
+#### Why is IoC central to Spring Boot?
+
+- IoC enables loose coupling, modularity, and easy testability. Code can be written and tested in isolation, with
+  dependencies provided automatically by Spring—rather than "hardwired" with `new SomeService()`.
+- **Everything in Spring Boot—automation, configuration, web endpoints, beans, scheduling, AOP, security—relies on the
+  IoC container managing object lifecycles.**
+
+#### IoC Container: What does it do?
+
+- The IoC container (in Spring, it's most often `ApplicationContext`) is the brain that:
+  - Discovers and creates all objects ("beans") annotated for management
+  - Resolves what depends on what (reading constructor args, `@Autowired`, etc.)
+  - Wires up those dependencies automatically (that’s dependency injection)
+  - Manages bean lifecycle (creation, injection, initialization, destruction)
+  - Applies cross-cutting concerns (AOP, proxies, etc.)
+  - Makes beans available for injection anywhere in the context
+
+#### IoC in Practice (2025):
+
+- **You almost never write or see XML for beans.**
+- Use annotations: `@Service`, `@Component`, etc. mark beans to be managed by Spring.
+- Use constructor injection (recommended), or field/setter injection for dependencies.
+- All beans are created and injected at startup, unless defined as lazy/prototype.
+
+Example:
+
+```java
+@Service
+public class TicketService {
+    private final NotificationService notification;
+    public TicketService(NotificationService notification) {
+        this.notification = notification;
+    }
+    // ...
+}
+```
+
+Here, you do NOT create or "new" the NotificationService anywhere; Spring finds it, makes it, and provides it.
+
+#### How does Dependency Injection relate to IoC?
+
+- **Dependency Injection (DI)** is the technique Spring uses to achieve IoC: you tell Spring what you need, Spring
+  injects it for you.
+- DI is a practical strategy—IoC is the overall philosophy that "the framework controls the app context, not my code."
+
+#### Why does it matter?
+
+- With IoC, you:
+  - decouple objects for reuse
+  - make testing simple (swap in mocks, test doubles)
+  - centralize object graph config and lifecycles
+  - gain all the power of container-level infrastructure (wiring, AOP, proxies, lifecycle hooks, etc)
+
+**Mental model:**
+> Think “My code describes what it needs; Spring figures out how and when it gets constructed and supplies it
+> automatically. I only write business logic.”
+
+---
+
+### 3.1. Spring Beans: The Core of Dependency Injection
+
+---
+
+### 3.1. Spring Beans: The Core of Dependency Injection
+
+#### What is a Spring Bean?
+
+A **Spring bean** is any object that is managed by the Spring container (ApplicationContext). Beans are the building
+blocks of every Spring and Spring Boot application—everything from controllers, services, repositories, to
+infrastructure objects (like ObjectMapper, DataSource, etc) are beans. A bean's creation, lifecycle, wiring, and
+destruction are all managed by the container.
+
+#### How Are Beans Created?
+
+There are several ways to define beans in a modern (2025) application:
+
+- **Annotation-Based (most common):**
+  - `@Component`: Generic bean
+  - `@Service`: Business logic/service
+  - `@Repository`: Data access/persistence/DAO (adds persistence exception translation)
+  - `@Controller`/`@RestController`: MVC/Web/REST endpoints
+  - `@Configuration` + `@Bean`: Programmatically registered beans
+- **XML-Based (rare, legacy):** Manually in `beans.xml` files
+- **Spring Boot Auto-Configuration:** Adds hundreds of beans based on classpath, properties, and conventions
+
+Example:
+
+```java
+@Service
+public class EmployeeService { ... } // This is a bean managed by Spring
+
+@Configuration
+public class InfraConfig {
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
+    }
+}
+```
+
+#### Core Spring Bean Annotations
+
+- `@Component` – Most generic; tells Spring to scan and manage as a bean
+- `@Service` – For services/business logic (semantically indicates intention)
+- `@Repository` – For DAOs (adds persistence exception translation)
+- `@Controller` / `@RestController` – For web/endpoints
+- `@Configuration` – For classes that create beans via explicit `@Bean` methods
+- `@Bean` – To register an arbitrary bean by method
+
+#### Dependency Injection (DI)
+
+Spring DI is the mechanism that injects beans wherever they're needed. There are 3 primary types:
+
+- **Constructor injection (recommended/best):**
+  ```java
+  @Service
+  public class OrderService {
+      private final PaymentGateway gateway;
+      public OrderService(PaymentGateway gateway) {
+          this.gateway = gateway;
+      }
+  }
+  ```
+  - Most robust, testable, and immutable.
+
+- **Field injection (not recommended for new code):**
+  ```java
+  @Autowired
+  private OrderRepository repository;
+  ```
+
+- **Setter injection:**
+  ```java
+  private ShipmentService shipmentService;
+  @Autowired
+  public void setShipmentService(ShipmentService shipmentService) {
+      this.shipmentService = shipmentService;
+  }
+  ```
+
+Spring automatically wires beans by type (and optionally by qualifier), resolving dependencies between beans.
+
+#### Bean Scopes
+
+Defines bean lifecycle and sharing semantics:
+
+- **singleton** (default): One bean instance per app context
+- **prototype**: New instance for every injection
+- **request** (web apps): One per HTTP request
+- **session** (web apps): One per HTTP session
+- **application, websocket**: Other advanced/rare scopes
+
+Example:
+
+```java
+@Component
+@Scope("prototype")
+public class Invoice {} // New bean created each time
+```
+
+#### Bean Lifecycle
+
+Beans have a managed lifecycle:
+
+- **Initialization**: After bean creation & DI, `@PostConstruct` method is called (if present)
+- **Destruction**: When app context is closed, `@PreDestroy` is called (if present)
+
+Advanced hooks:
+
+- Implementing `InitializingBean` and `DisposableBean`
+- Implementing `BeanPostProcessor` for custom actions
+
+Example:
+
+```java
+@Component
+public class CacheManager {
+    @PostConstruct
+    public void warmUp() { ... }
+    @PreDestroy
+    public void shutdown() { ... }
+}
+```
+
+#### Spring Boot Auto-Configuration and Beans
+
+- Spring Boot auto-configuration defines many `@Configuration` classes with `@Bean` methods (includes
+  `@ConditionalOnClass`, etc).
+- These supply “infrastructure beans” (ObjectMapper, DataSource, RestTemplate, etc) that your code can inject without
+  extra wiring.
+- You can **override** any auto-configured bean by defining your own bean of the same type or name.
+
+#### Customizing/Overriding Beans:
+
+- Just declare your own bean (with `@Bean` or `@Component`  ̶; highest precedence wins).
+- Use `@Primary` to make a specific bean default if there are multiple choices.
+- Remove/exclude beans via configuration or use `spring.autoconfigure.exclude=...`.
+
+#### Why Beans Matter
+
+- **Modularity:** Everything is loosely wired by interfaces, easily swapped
+- **Testability:** Beans can be mocked or replaced in tests
+- **Decoupling:** Your code never “news” a dependency, enabling inversion of control (IoC)
+- **Observability/Tracing:** Many operations (e.g. AOP, transaction, security) all work via bean proxying
+- **Lifecycle Management:** Initialization/shutdown are managed automatically
+
+#### Interview/Mastery Notes
+
+- What is a Spring bean? How is it different from a plain Java object?
+- Name all ways to register a bean (annotation, @Bean method, XML, auto-config)
+- Explain the difference between singleton and prototype scopes
+- Show constructor vs field vs setter injection (and why constructor is enterprise standard)
+- What happens if two beans of same type? How do you control which gets injected?
+- How do you override or customize an auto-configured bean in Spring Boot?
+- Describe bean lifecycle (initialization, PostConstruct, PreDestroy, destruction)
+- Why is DI important for modularity and testability?
+
+---
+
+### 3.2. Spring Application Events: Decoupling and Modular Design
+
+#### Why Use Spring Events?
+
+Spring application events provide a powerful, in-process pub/sub mechanism for decoupling components, freeing you from
+direct service-to-service calls. They enable:
+
+- **Modular Monoliths**: Internal domain events can trigger modular, decoupled business logic (DDD, clean architecture)
+- **Loose Coupling**: Callers and listeners do not need to know about each other
+- **Extensibility**: New features (auditing, notifications, workflows) added with no change to the core logic
+- **Side Effects**: Fire-and-forget operations, e.g. sending emails, logging, stats gathering
+
+#### Defining and Publishing Events
+
+- **Event Definition**: Any POJO can be an event (since Spring 4.2+). Extending `ApplicationEvent` is optional.
+  ```java
+  public class TicketCreatedEvent {
+      private final Long ticketId;
+      public TicketCreatedEvent(Long ticketId) { this.ticketId = ticketId; }
+      public Long getTicketId() { return ticketId; }
+  }
+  ```
+- **Publishing**: Inject `ApplicationEventPublisher` and call `publishEvent()`.
+  ```java
+  @Service
+  public class TicketService {
+      @Autowired
+      private ApplicationEventPublisher eventPublisher;
+      public void createTicket(Ticket ticket) {
+          // ... business logic ...
+          eventPublisher.publishEvent(new TicketCreatedEvent(ticket.getId()));
+      }
+  }
+  ```
+
+#### Listening to Events
+
+- **Classic:** Implement `ApplicationListener<TicketCreatedEvent>`:
+  ```java
+  @Component
+  public class TicketNotificationListener implements ApplicationListener<TicketCreatedEvent> {
+      @Override
+      public void onApplicationEvent(TicketCreatedEvent event) { /* ... */ }
+  }
+  ```
+- **Modern:** Use `@EventListener` annotation (recommended in 2025):
+  ```java
+  @Component
+  public class AuditLogListener {
+      @EventListener
+      public void logEvent(TicketCreatedEvent event) { /* ... */ }
+  }
+  ```
+- **Conditional Listener with SpEL:**
+  ```java
+  @EventListener(condition = "#event.critical == true")
+  public void onCriticalTicket(TicketCreatedEvent event) {...}
+  ```
+- **Generic Events:** Listeners can listen to event base types; use for common polymorphic logic.
+
+#### Asynchronous Event Handling
+
+- Synchronous by default; all listener methods execute on publisher thread.
+- Asynchronous handled with `@Async` annotation and `@EnableAsync` configuration:
+  ```java
+  @Async
+  @EventListener
+  public void handleAsyncEvent(CustomEvent event) {...}
+  ```
+
+#### Transactional Event Listeners
+
+- **@TransactionalEventListener** allows you to trigger event listeners *within* or *after* a transaction:
+  ```java
+  @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
+  public void afterCommitListener(DomainEvent event) {...}
+  ```
+  - Phases: BEFORE_COMMIT, AFTER_COMMIT (default), AFTER_ROLLBACK, AFTER_COMPLETION
+- Powerful in DDD for domain events, guarantees consistency with DB state.
+
+#### Ordering Multiple Listeners
+
+- Multiple listeners for the same event have an undefined order by default.
+- Enforce order with `@Order` annotation on listener methods/classes.
+
+#### Modular Monoliths and Event Persistence (Spring Modulith)
+
+- **Spring Modulith** (2023+): Enterprise pattern for modular monoliths
+  - Provides event persistence ("event outbox"), reliable delivery, event replay, externalization to Kafka/RabbitMQ/etc.
+  - Use `@ApplicationModuleListener` for durable, replayable events; supports transactional guarantees
+  - Great for testability and resilience in complex apps
+
+#### Best Practices (2025)
+
+- Use events to decouple module boundaries, implement side effects, build for extensibility
+- Avoid events where strict ordering or mandatory execution is required; call service methods directly in critical/core
+  flows
+- Prefer `@EventListener` over legacy interfaces
+- Use async events for long-running/out-of-band processing, but ensure you handle reliability/failure
+- For high resilience: consider Spring Modulith or integrate with message brokers for persistent delivery
+- Keep listener logic minimal and focused
+- Test event listeners thoroughly (use `ApplicationEventPublisher` in tests)
+
+#### Real-World Patterns
+
+- Domain events (DDD): State changes fire events, other modules react
+- Audit logging, email notifications, external system sync, stats/metrics
+- Modular monoliths: module boundaries communicate via events
+- Microservices migration: start with events internally, externalize later
+
+#### Caveats, Limitations, and Weaknesses
+
+- Ordinary Spring events are in-memory only and can be lost on crash (modulith or brokers needed for durability)
+- Bad for core, critical workflow steps
+- Async listeners must be managed for error handling and retries
+- Transactional event listeners only trigger if the transaction exists
+
+#### Interview/Mastery Notes
+
+- Compare `@EventListener` vs. `ApplicationListener`
+- Explain when to use events vs. service calls
+- What are transactional events and when required?
+- How to make events async?
+- What is Spring Modulith and why use it?
+- How to write/test event-driven modular Java apps?
+- Pitfalls: listener execution order, reliability, performance, event loss
+- How to document and test which events your app produces/consumes?
+
+---
+
+### 3.3. Spring Resource Abstraction & ResourceLoader
+
+#### What Is a Resource in Spring?
+
+A **Spring resource** is an abstraction representing data (e.g. files, URLs, blobs, config, streams) regardless of its
+underlying source. This lets you work with application resources (files, data, templates, config, static assets) in a
+uniform way—across classpath, filesystem, web, JARs, cloud, or even custom protocols.
+
+The central interface: `org.springframework.core.io.Resource` with methods:
+
+- `getInputStream()`, `getFile()`, `exists()`, `getURL()`, `getFilename()`, `getDescription()`, etc.
+
+#### How to Load Resources
+
+**1. ResourceLoader (core method):**
+
+- All Spring application contexts implement `ResourceLoader` (method: `getResource(String location)`).
+- You can inject `ResourceLoader` or use the context (e.g. `ApplicationContext`).
+
+```java
+@Service
+public class ConfigService {
+    @Autowired
+    private ResourceLoader resourceLoader;
+    public String loadConfigFile() {
+        Resource resource = resourceLoader.getResource("classpath:config.yaml");
+        // read with InputStream, etc.
+    }
+}
+```
+
+**2. @Value injection:**
+
+```java
+@Component
+public class FileLoader {
+    @Value("classpath:templates/template.html")
+    private Resource htmlTemplate;
+    // ... use htmlTemplate.getInputStream() ...
+}
+```
+
+**3. ResourceUtils:**
+
+- Utility for classic `File`/`URL`/classpath resolution (`ResourceUtils.getFile("classpath:xyz.txt")`)
+
+#### Resource Types
+
+- `ClassPathResource`: Loads from classpath/JAR/WAR (`classpath:myfile.txt`)
+- `FileSystemResource`: Loads from OS filesystem (`file:/var/data/foo.txt`)
+- `UrlResource`: Loads from any valid URL (`file:`, `http:`, `https:`, etc.)
+- `ServletContextResource`: Web contexts (rare for non-Legacy Spring Boot)
+- `ByteArrayResource`, `InputStreamResource`: In-memory or custom
+- (*) Many more: see [docs](https://docs.spring.io/spring-framework/reference/core/resources.html)
+
+#### Usage Examples
+
+- Loading config or data files:
+    ```java
+    @Value("classpath:data/sample.json")
+    private Resource sampleData;
+    String json = IOUtils.toString(sampleData.getInputStream(), StandardCharsets.UTF_8);
+    ```
+- Binary files, static media, templates: use `Resource` to provide input to service logic, PDF/image generation, etc.
+- Reading resource as `File` (be careful—works only on exploded WAR/JAR in dev, NOT always in prod):
+    ```java
+    File image = resourceLoader.getResource("classpath:img/logo.png").getFile();
+    ```
+
+#### Resource Wildcards, Path Matching, Resolution Order
+
+- Use `ResourcePatternResolver` for wildcards (`classpath*:com/example/**/*.xml`) to load many at once
+    ```java
+    @Autowired ResourcePatternResolver resolver;
+    Resource[] resources = resolver.getResources("classpath*:templates/*.html");
+    ```
+- Order: `classpath:` and `file:` prefixes (explicit) control loader type. No prefix: default context behavior (
+  classpath for most Boot apps).
+- Path matching and Ant-style wildcards supported with context-aware loaders
+
+#### Custom Resource Implementations, Custom ResourceLoader
+
+- For advanced needs: implement `Resource` for DB, S3, network, etc. ProtocolResolver: add new prefix (ex: `s3://`)
+- Register new protocols for resources with ResourceLoader in Boot
+- Used in SaaS/multi-tenant, content APIs, plug-in discovery
+
+#### Best Practices
+
+- Place all app data/resources in `src/main/resources/`; static, template, or asset subfolders as needed
+- Use classpath resources for common config, data, templates, test stubs
+- Design code to accept `Resource`, not `File` or `InputStream` for testability and packaging flexibility
+- Be aware: `File` will fail for resources inside JAR/WAR (prefer streams, filenames, or copy to temp)
+- Test resource loading in both dev (exploded) and prod (packaged/JAR) to avoid surprises
+
+#### Pitfalls
+
+- File-based loading (`getFile()`) fails in packaged apps (JAR/WAR)
+- Classpath confusion if resource in wrong directory or wrong case
+- Wildcards (`classpath*`) are powerful but have edge cases with JARs/classloaders—test in CI/CD
+- Multiple resources with same name in several JARs—Spring may use first found!
+
+#### Interview Notes/Q&A
+
+- Resource abstraction vs. File/URL
+- @Value/resourceLoader in testable design
+- When NOT to use `File` (answer: packaged apps!)
+- Strategies for large-scale resources or DB/cloud loader
+- How to test multi-classpath-location loads
+
+---
 
 Spring Boot’s “core concepts” lay the foundation for rapid, production-grade Java application development in 2025.
 Mastering these enables you to diagnose problems, build robust applications, and answer interview/architecture questions
@@ -265,7 +808,379 @@ with authority.
 
 ---
 
-#### 3.1. `@SpringBootApplication` and Meta-Annotations
+#### 3.4. Data Binding and Type Conversion in Spring Boot
+
+#### What is Data Binding in Spring?
+
+- **Data binding** is the automatic process of mapping external data (e.g. web requests, forms, JSON, configs) to Java
+  objects (controllers, DTOs, @ConfigurationProperties, beans).
+- Enables seamless population of POJOs from requests, properties, YAML, web forms, etc.
+
+#### Core Abstractions
+
+- **DataBinder / WebDataBinder**: The core objects for mapping Strings to object fields. Used internally by web/MVC and
+  config binding. You can extend/customize (rare for modern use).
+- **BeanWrapper**: Lower-level utility for setting/getting bean properties (supports nested paths, etc). Used
+  internally.
+- **PropertyEditor** _(legacy)_: Thread-unsafe, string-to-type; still supported for backward compatibility but not
+  recommended in new code.
+
+#### ConversionService (Modern Standard)
+
+- **ConversionService**: Central type conversion API (thread-safe, modern, strongly-typed). Used by Spring Boot, Spring
+  MVC, config, validation.
+  - Built-in converters: String <-> Number, String <-> Date, Enum, Boolean, collections, maps, Java 8 time, etc.
+  - **Formatter**: Higher-level API for parsing/printing (esp. with localization/i18n and display as well as input).
+
+Example:
+
+```java
+@ConfigurationProperties(prefix = "notify")
+public class NotifyProps {
+    private Duration debounceTimeout; // "1m" in YAML → Duration
+    // setters/getters
+}
+// in application.yml: notify: debounceTimeout: 1m
+```
+
+Spring uses ConversionService to bind "1m" to `Duration`.
+
+#### Registering Custom Converters & Formatters
+
+- **Converter<S, T>**: Convert source to target type (e.g., String→UserId)
+  ```java
+  @Component
+  public class StringToUserIdConverter implements Converter<String, UserId> {
+      public UserId convert(String s) { return new UserId(Long.parseLong(s)); }
+  }
+  ```
+- **Formatter<T>**: For types with both parse (String→T) and print (T→String)
+  ```java
+  @Component
+  public class MoneyFormatter implements Formatter<Money> {
+    ... // parse(String, Locale), print(Money, Locale)
+  }
+  ```
+- Register as beans (auto-detected in Boot), or add via `WebMvcConfigurer.addFormatters()`
+- **@DateTimeFormat, @NumberFormat** annotations: Per-property auto-conversion/formatting for web forms and config
+
+#### Using @InitBinder for Controller-Specific Conversion
+
+```java
+@Controller
+public class AccountController {
+    @InitBinder
+    public void initBinder(WebDataBinder binder) {
+        binder.addCustomFormatter(new MoneyFormatter());
+    }
+}
+```
+
+#### Data Binding in MVC/Web
+
+- @ModelAttribute maps form/query/path fields to POJOs via DataBinder & ConversionService
+- JSON/XML binding via Jackson (uses ConversionService for field conversions)
+- MVC pipes everything through ConversionService (global and local)
+
+#### Advanced: Conditional, Context-Aware, Chained Converters
+
+- Write ConverterFactory or GenericConverter (e.g., handling hierarchies, multi-criteria)
+- Use TypeDescriptor for generic types, annotations, metadata
+
+#### Property Editors (Legacy):
+
+- JavaBeans `PropertyEditor` support for compatibility—still used in @InitBinder, but only for old code; not
+  thread-safe, prefer Converter/Formatter.
+
+#### Error Handling, Nulls, and Validation
+
+- Conversion errors by default trigger binding errors in Spring MVC/config
+- To handle errors: use `@Valid` and binding result handling for custom messages
+- Nulls: non-convertible fields are null unless required/not-null constraint
+
+#### Pitfalls
+
+- Custom PropertyEditors are NOT thread-safe; prefer Converter/Formatter
+- `getFile()` pitfalls: only works on disk, not with resources in JAR/WAR
+- Carefully match field/property names/types for successful binding
+- Global vs. local conversion: accidentally conflicting formatters/converters (test thoroughly)
+
+#### Best Practices (2025)
+
+- Prefer strongly-typed, thread-safe `Converter`/`Formatter` via bean registration
+- Use `@ConfigurationProperties` for config with type safety
+- Use `@DateTimeFormat`, `@NumberFormat` for local formatting
+- Leverage global ConversionService for domain types across app
+- Test custom converters with unit and integration tests (inject ConversionService, try edge cases)
+- Document expected formats for config, request, and display for frontends
+
+#### Interview/Mastery Notes
+
+- ConversionService vs. PropertyEditor?
+- How does formatter registration order affect binding?
+- What’s the difference between Converter, Formatter, ConverterFactory, GenericConverter?
+- How does @InitBinder work? Why use it?
+- What happens if a type is not convertible? How do you override a global converter?
+- How does type conversion work for config properties and web endpoints?
+- How to test converters and diagnose binding failures?
+
+#### Further Reading
+
+- [Spring Conversion and Formatting Docs](https://docs.spring.io/spring-framework/reference/core/validation/convert.html)
+- [Baeldung: Spring Type Conversions](https://www.baeldung.com/spring-type-conversions)
+- [Spring MVC Data Binding](https://docs.spring.io/spring-framework/reference/web/webmvc/mvc-config/conversion.html)
+- [@ConfigurationProperties Binding](https://docs.spring.io/spring-boot/docs/current/reference/html/configuration-properties.html)
+
+---
+
+### 3.5. Spring Expression Language (SpEL): Dynamic Power in Annotations and Config
+
+#### What is SpEL?
+
+- **Spring Expression Language (SpEL)** is a powerful, runtime expression language built into the Spring ecosystem
+- Evaluates snippets (“expressions”) in configuration, annotations, and code: enables dynamic values, property
+  injection, security, and conditional logic
+- Used for: dynamic bean wiring, property injection, conditional beans/binding, filtering collections, advanced
+  security, and more
+
+#### Core Syntax and Capabilities
+
+- Expression marker: `#{...}` (evaluates at runtime)
+- **Literals:** `'string'`, `123`, `true`, `null`
+- **Property/method access:** `#{user.name}`, `#{user.getEmail()}`
+- **Operators:** arithmetic (`+,-,*,/`), comparison (`==,!=,<,>`, etc), logical (`&&,||,!`), ternary, Elvis (`?:`)
+- **Static method calls:** `#{T(java.lang.Math).max(2, 10)}`
+- **Variables/refs:** `#{#root}`, `#{#this}`, `#{#user}`, `#{@myBean.someMethod()}`
+- **Collections/maps:** `#{user.orders[0]}`, `#{myMap['key']}`
+
+#### Where SpEL is Used (Spring Boot/Framework)
+
+- **@Value:** inject dynamic/derived/config/property values into bean fields
+    ```java
+    @Value("#{2 * 60 * 1000}")
+    private int twoMinutesMillis; // Evaluates to 120000
+    @Value("#{@appPropsBean.timeout ?: 5000}")
+    private int timeout; // Use bean property, fallback to 5000
+    ```
+- **@ConditionalOnExpression:** Auto-config/Boot—include/exclude beans based on SpEL evaluation
+    ```java
+    @ConditionalOnExpression("'${spring.profiles.active}' == 'dev'")
+    ```
+- **@EventListener(condition = ...):** Listen only under runtime condition
+    ```java
+    @EventListener(condition = "#event.priority == 'HIGH'")
+    public void handleHighPriority(Event event) {...}
+    ```
+- **@PreAuthorize, @PostAuthorize:** Advanced method security (Spring Security):
+    ```java
+    @PreAuthorize("hasRole('ADMIN') || #userId == authentication.principal.id")
+    public void deleteUser(Long userId) { ... }
+    ```
+- **@Scheduled:** Dynamic cron from bean/expression
+    ```java
+    @Scheduled(cron = "#{@cronProvider.getCron()}")
+    ```
+- **@Cacheable:** Dynamic cache keys, conditional caching
+    ```java
+    @Cacheable(value="users", key="#user.id", condition="#user.active")
+    ```
+- **application.yaml/properties:** For some Boot features (rare, risky—prefer Java/annot usage)
+
+#### Programmatic SpEL Usage
+
+```java
+@Autowired
+Environment env;
+ExpressionParser parser = new SpelExpressionParser();
+int val = parser.parseExpression("1 + 2").getValue(Integer.class); // == 3
+String adminEmail = parser.parseExpression("'help@' + systemProperties['user.domain']").getValue(String.class);
+```
+
+#### Advanced Features
+
+- **Custom SpEL Functions:** Register static methods for use in SpEL
+- **Collection projections/filtering:** `orders.?[status=='PAID']`, access/stream/filter/transform
+- **Bean references:** Access other beans with `@` syntax: `#{@orderService.topOrders(5)}`
+- **Context objects:** `#root`, `#this`, method argument names in security/event expressions
+
+#### Best Practices & Anti-patterns
+
+- Use SpEL for *configuration*, property wiring, and *conditional logic*, NOT for business logic
+- Keep expressions short, simple, and maintainable; avoid deep chains or complex code-in-strings
+- Validate expressions at startup (fail fast); prefer compile-time safety when possible
+- In security: use SpEL as intended, but don’t allow user input into expressions
+- Use modern Boot features (`@ConfigurationProperties`, service beans) for most config, only use SpEL for dynamic bits
+
+#### Pitfalls & Security
+
+- SpEL errors only appear at runtime (linter/IDE doesn’t check)
+- Overusing SpEL makes code brittle/harder to refactor/test
+- SpEL is powerful enough to be dangerous: can instantiate classes, call methods, potentially risky if expressions are
+  ever user-controllable
+- Performance: Avoid in performance-critical inner loops
+
+#### Debugging SpEL
+
+- Parse errors: catch at startup if used in config, or via clear stack traces in test
+- Use logs or boot debug to see evaluation failures
+- Write unit tests/cases for custom SpEL
+
+#### Interview/Mastery Q&A
+
+- What is SpEL and how is it used in modern Spring Boot?
+- Where is SpEL used in config vs annotation vs code?
+- How does SpEL compare to Java EE EL or OGNL/other ELs?
+- What are pitfalls and anti-patterns with SpEL? Security issues?
+- How do you troubleshoot/validate/integration-test SpEL-heavy code?
+
+#### Further Reading
+
+- [Official SpEL Documentation](https://docs.spring.io/spring-framework/reference/core/expressions.html)
+- [Baeldung: Spring Expression Language](https://www.baeldung.com/spring-expression-language)
+- [SpEL with Method Security](https://www.javacodegeeks.com/2025/05/fine-grained-authorization-with-spring-security-and-preauthorize-annotations.html)
+- [Spring Scheduling with SpEL](https://docs.spring.io/spring-framework/reference/integration/scheduling.html#scheduling-annotation-support)
+
+---
+
+### 3.6. Aspect-Oriented Programming (AOP) in Spring: Separation of Cross-Cutting Concerns
+
+#### What is AOP in Spring?
+
+- **Aspect-Oriented Programming (AOP)** is a paradigm to modularize “cross-cutting concerns” (logging, security,
+  transactions, metrics, auditing) so they don’t pollute your business logic.
+- Enables you to define *aspects* and *advices* that are applied “around” methods, decoupling infrastructure from core
+  code.
+- In enterprise Java, AOP is critical for transaction management, access control, observability, and unified logging:
+  all invisible to the primary code.
+
+#### Core AOP Concepts
+
+- **Aspect:** A class that encapsulates cross-cutting concerns (e.g., LoggingAspect)
+- **Join Point:** A point during execution (usually a method call) where an aspect can be applied
+- **Advice:** The action to be taken at a join point (`@Before`, `@After`, etc)
+- **Pointcut:** Predicate/expression that matches join points (e.g., all methods in package, or @Transactional methods)
+- **Target:** The object being advised
+- **AOP Proxy:** The runtime proxy that intercepts method calls (created by Spring)
+- **Weaving:** Process of linking aspects and code (Spring: done at runtime with proxies)
+
+#### Spring AOP vs. AspectJ
+
+- **Spring AOP**: Proxy-based (JDK proxy for interfaces, CGLIB subclass if no interfaces). Only method execution join
+  points on Spring beans. Weaving occurs at runtime.
+- **AspectJ**: Compile-time or load-time weaving. Supports field, constructor, method, and more. Use for super-advanced,
+  non-bean, or highly fine-grained concerns.
+
+#### Types of Advice (code samples)
+
+- **@Before**: Executes before the join point
+  ```java
+  @Aspect
+  @Component
+  public class LoggingAspect {
+      @Before("execution(* com.example.service.*.*(..))")
+      public void logBefore(JoinPoint jp) { log.info("Before: {}", jp.getSignature()); }
+  }
+  ```
+- **@After**: After method completes (regardless of outcome)
+  ```java
+  @After("execution(* com.example.service.*.*(..))")
+  public void logAfter(JoinPoint jp) { log.info("After: {}", jp.getSignature()); }
+  ```
+- **@AfterReturning**: After method returns successfully
+  ```java
+  @AfterReturning(pointcut = "execution(* com.example.*.*(..))", returning = "result")
+  public void afterReturning(JoinPoint jp, Object result) { log.info("Returned: {}", result); }
+  ```
+- **@AfterThrowing**: After method throws exception
+  ```java
+  @AfterThrowing(pointcut = "execution(* com.example.*.*(..))", throwing = "ex")
+  public void afterThrowing(JoinPoint jp, Exception ex) { log.warn("Exception: {}", ex.getMessage()); }
+  ```
+- **@Around**: Surrounds method execution (can short-circuit or modify input/output)
+  ```java
+  @Around("execution(* com.example.service.PaymentService.*(..))")
+  public Object timeExecution(ProceedingJoinPoint pjp) throws Throwable {
+      long start = System.currentTimeMillis();
+      Object result = pjp.proceed();
+      long elapsed = System.currentTimeMillis() - start;
+      log.info("{} executed in {}ms", pjp.getSignature(), elapsed);
+      return result;
+  }
+  ```
+
+#### Defining and Configuring Aspects
+
+- Mark aspect classes with `@Aspect` + `@Component`, use `@EnableAspectJAutoProxy` in config/main app
+- Pointcut expressions: `execution`, `within`, `args`, `@annotation`, etc.
+  - `execution(* com.example..*Service.save*(..))`: All save* methods in ...Service
+  - `@annotation(org.springframework.transaction.annotation.Transactional)`: All transactional methods
+- Bind arguments in pointcuts: use named arguments (`args(name,...)`)
+
+#### Real-World Patterns and Enterprise Use Cases
+
+- **Logging:** Unified before/after/audit/metrics logging
+- **Security:** Access control, permission checks, method security
+- **Transaction Management:** Core strategy for @Transactional
+- **Validation:** Pre-processing arguments (with JoinPoint)
+- **Caching:** Cross-cutting cache, fallback, eviction
+- **Resilience:** Combine with Resilience4j (@Around)
+- **Tracing/Observability:** Metrics/telemetry spanning methods (
+  OpenTelemetry, custom metrics)
+
+#### How Proxies Work (JDK Proxy vs. CGLIB)
+
+- Spring AOP creates a runtime proxy for any eligible Spring bean
+- If bean has interface: uses JDK proxy (only proxies interface)
+- If bean has no interface: uses CGLIB to create subclass (all public/protected methods)
+- **Limitation:** Only calls from outside bean go through proxy—internal method calls (this.foo()) do not trigger advice
+- **Private/static/final methods cannot be advised!**
+
+#### Best Practices and Common Pitfalls
+
+- Design aspects for *single* concerns: do not bundle unrelated logic
+- Avoid placing business logic in aspects; focus on infrastructure, audit, security, logic overlays
+- Be cautious with pointcut expressions—test for accuracy, avoid over-broad or overlapping pointcuts
+- Mind the performance: heavy advice code, or Too Many proxies, degrades perf
+- **Proxy trap:** Advice only applies to calls through the Spring IoC/proxy, not to internal method-to-method calls
+
+#### Testing and Troubleshooting Aspects
+
+- Unit-test aspects directly or via integration tests
+- Use logs to verify advice is applied
+- Use proxy-target-class, `@AspectJAutoProxy`, and check `AopProxyUtils.ultimateTargetClass()` if debugging
+
+#### When to Choose AspectJ
+
+- Use pure AspectJ (compile/load-time weaving) for non-bean, non-public, field-level, or third-party integration
+- For most Boot apps, stick with Spring AOP unless you require super-fine-grained joint points
+
+#### Advanced Integrations
+
+- Combine AOP with @Transactional, security (Spring Security), Resilience4j annotations, and OpenTelemetry
+  metrics/tracing (@Around for span creation)
+
+#### Interview/Mastery Notes & Q&A
+
+- Compare Spring AOP vs AspectJ—when/why each?
+- How does an @Around advice differ from @Before/@After? Use case?
+- What’s a join point, pointcut, advice? Example for each?
+- How do proxies work? Why isn’t advice applied to private/static/final/self-invoked methods?
+- List steps to debug an aspect that “isn’t running.”
+- Trade-offs of placing business or visibility logic in aspects?
+- How to test/monitor/prove AOP works in prod?
+- What’s the effect of AOP on proxy performance, and how do you mitigate?
+
+#### Further Reading
+
+- [Spring AOP Reference](https://docs.spring.io/spring-framework/reference/core/aop/introduction-spring-defn.html)
+- [Baeldung: Guide to Spring AOP](https://www.baeldung.com/spring-aop)
+- [Spring Boot AOP Best Practices (2025)](https://medium.com/@sharmapraveen91/mastering-spring-aop-the-ultimate-guide-for-2025-55a146c8204c)
+- [AspectJ Project](https://www.eclipse.org/aspectj/)
+- [OpenTelemetry for Java: Spans & AOP](https://opentelemetry.io/docs/instrumentation/java/manual/#spring-apps)
+
+---
+
+### 3.7. `@SpringBootApplication` and Meta-Annotations
 
 - **Definition:** Combines three key Spring annotations:
     - `@Configuration`: Marks the class as a source of bean definitions.
@@ -302,7 +1217,7 @@ with authority.
 
 ---
 
-#### 3.2. Configuration: `application.properties` vs `application.yml`
+#### 3.7. Configuration: `application.properties` vs `application.yml`
 
 Spring Boot uses *externalized configuration* so your code and environment setup are cleanly separated.
 
@@ -363,7 +1278,7 @@ spring:
 
 ---
 
-#### 3.3. Auto-Configuration & Custom Configuration
+#### 3.8. Auto-Configuration & Custom Configuration
 
 - **Auto-Configuration:**
     - Spring Boot scans your classpath for known dependencies (“starters”) and automatically configures beans/settings
@@ -406,7 +1321,7 @@ spring:
 
 ---
 
-#### 3.4. Conditional Beans
+#### 3.9. Conditional Beans
 
 Conditional activation lets you wire up “smart” beans, only present in certain environments or if other beans, classes,
 properties, or profiles exist.
@@ -452,7 +1367,7 @@ public TestDataGenerator testDataGenerator() {
 
 ---
 
-#### 3.5. Profiles
+#### 3.10. Profiles
 
 Profiles allow your app to vary configuration and bean setup for different environments (dev, test, prod, staging,
 CI/CD, etc.).
@@ -491,7 +1406,7 @@ public DataSource prodDataSource() {
 
 ---
 
-#### 3.6. Embedded Server Options
+#### 3.11. Embedded Server Options
 
 Spring Boot comes *preconfigured* with embedded servlet containers.
 
@@ -544,7 +1459,7 @@ server.port=8443
 
 ---
 
-#### 3.7. Logging Configuration
+#### 3.12. Logging Configuration
 
 Logging in Spring Boot is handled through SLF4J with Logback (default) or Log4j2.
 
@@ -588,7 +1503,7 @@ logging.pattern.console=%d{HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n
 
 ---
 
-#### 3.8. Key Updates in Spring Boot 3.x / 3.5 (2025)
+#### 3.13. Key Updates in Spring Boot 3.x / 3.5 (2025)
 
 Spring Boot continues evolving for modern Java and cloud-native needs, especially since 3.x:
 
@@ -649,7 +1564,7 @@ Spring Boot continues evolving for modern Java and cloud-native needs, especiall
 
 ---
 
-#### 3.9. Interview “Must Knows”, Practice & Troubleshooting Tips
+#### 3.14. Interview “Must Knows”, Practice & Troubleshooting Tips
 
 - Know the difference between classic Spring config and Boot auto-config.
 - How and why to customize auto-config (incl. `@ConditionalOnMissingBean` usage).
@@ -668,7 +1583,7 @@ Spring Boot continues evolving for modern Java and cloud-native needs, especiall
 
 ---
 
-#### Further Reading & Practice Links
+#### 3.15. Further Reading & Practice Links
 
 - [Spring Boot Application Properties](https://docs.spring.io/spring-boot/docs/current/reference/html/application-properties.html)
 - [Conditional Configuration](https://docs.spring.io/spring-boot/docs/current/reference/html/features.html#features.developing-auto-configuration)

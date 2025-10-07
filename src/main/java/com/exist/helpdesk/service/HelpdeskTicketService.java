@@ -36,10 +36,10 @@ public class HelpdeskTicketService {
 
     public HelpdeskTicketResponseDTO createTicket(HelpdeskTicketCreateRequestDTO dto) {
         HelpdeskTicket ticket = ticketMapper.toEntity(dto);
-        ticket.setAssignee(employeeService.getEmployeeEntityById(dto.getAssigneeId()));
+        ticket.setAssignee(employeeService.getEmployeeEntityById(dto.assigneeId()));
         ticket.setCreatedDate(LocalDateTime.now());
         ticket.setUpdatedDate(LocalDateTime.now());
-        ticket.setStatus((dto.getFiled() != null && !dto.getFiled()) ? "draft" : "filed");
+        ticket.setStatus((dto.filed() != null && !dto.filed()) ? "draft" : "filed");
         ticket.setRemarks(new ArrayList<>());
         ticket.setTicketNumber("EXIST-" + UUID.randomUUID().toString().substring(0, 8).toUpperCase());
         HelpdeskTicket saved = ticketRepository.save(ticket);
@@ -50,8 +50,8 @@ public class HelpdeskTicketService {
         HelpdeskTicket ticket = ticketRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Ticket with id " + id + " not found"));
         ticketMapper.updateEntityFromDto(dto, ticket);
-        if (dto.getAssigneeId() != null) {
-            ticket.setAssignee(employeeService.getEmployeeEntityById(dto.getAssigneeId()));
+        if (dto.assigneeId() != null) {
+            ticket.setAssignee(employeeService.getEmployeeEntityById(dto.assigneeId()));
         }
         ticket.setUpdatedDate(LocalDateTime.now());
         HelpdeskTicket saved = ticketRepository.save(ticket);

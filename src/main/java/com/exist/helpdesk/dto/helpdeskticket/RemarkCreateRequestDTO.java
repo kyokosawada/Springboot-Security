@@ -1,15 +1,12 @@
 package com.exist.helpdesk.dto.helpdeskticket;
 
-import lombok.*;
 import jakarta.validation.constraints.*;
 
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
-@Builder
-public class RemarkCreateRequestDTO {
-    @NotBlank
-    private String remark;
-    @NotBlank
-    private String addedBy;
+public record RemarkCreateRequestDTO(
+        @NotBlank
+        String remark,
+
+        @NotBlank
+        String addedBy
+) {
 }

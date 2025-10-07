@@ -1,15 +1,10 @@
 package com.exist.helpdesk.dto.helpdeskticket;
 
-import lombok.*;
-
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
-@Builder
-public class HelpdeskTicketUpdateRequestDTO {
-    private String title;
-    private String body;
-    private String status;
-    private Long assigneeId;
-    private String updatedBy;
+public record HelpdeskTicketUpdateRequestDTO(
+        String title,
+        String body,
+        String status,
+        Long assigneeId,
+        String updatedBy
+) {
 }

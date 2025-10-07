@@ -1,30 +1,24 @@
 package com.exist.helpdesk.dto.employee;
 
-import lombok.*;
 import jakarta.validation.constraints.*;
 
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
-@Builder
-public class EmployeeCreateRequestDTO {
-    @NotBlank
-    private String name;
+public record EmployeeCreateRequestDTO(
+        @NotBlank
+        String name,
 
-    @NotNull
-    @Min(18)
-    private Integer age;
+        @NotNull @Min(18)
+        Integer age,
 
-    @NotBlank
-    private String address;
+        @NotBlank
+        String address,
 
-    @NotBlank
-    @Pattern(regexp = "^\\+?[0-9]{7,15}$")
-    private String phone;
+        @NotBlank
+        @Pattern(regexp = "^\\+?[0-9]{7,15}$")
+        String phone,
 
-    @NotBlank
-    private String employmentStatus;
+        @NotBlank
+        String employmentStatus,
 
-    @NotNull
-    private Long roleId;
+        @NotNull Long roleId
+) {
 }

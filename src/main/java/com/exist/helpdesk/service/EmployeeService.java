@@ -82,7 +82,7 @@ public class EmployeeService {
 
     public EmployeeResponseDTO createEmployee(EmployeeCreateRequestDTO dto) {
         Employee employee = employeeMapper.toEntity(dto);
-        Role role = roleService.getRoleEntityById(dto.getRoleId());
+        Role role = roleService.getRoleEntityById(dto.roleId());
         employee.setRole(role);
         Employee saved = employeeRepository.save(employee);
         return employeeMapper.toResponse(saved);
@@ -92,8 +92,8 @@ public class EmployeeService {
         Employee emp = employeeRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Employee with id " + id + " not found"));
         employeeMapper.updateEmployeeFromDto(request, emp);
-        if (request.getRoleId() != null) {
-            Role role = roleService.getRoleEntityById(request.getRoleId());
+        if (request.roleId() != null) {
+            Role role = roleService.getRoleEntityById(request.roleId());
             emp.setRole(role);
         }
         Employee saved = employeeRepository.save(emp);

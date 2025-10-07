@@ -1,24 +1,20 @@
 package com.exist.helpdesk.dto.helpdeskticket;
 
-import lombok.*;
 import jakarta.validation.constraints.*;
 
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
-@Builder
-public class HelpdeskTicketCreateRequestDTO {
-    @NotBlank
-    private String title;
+public record HelpdeskTicketCreateRequestDTO(
+        @NotBlank
+        String title,
 
-    @NotBlank
-    private String name;
+        @NotBlank
+        String name,
 
-    @NotBlank
-    private String body;
+        @NotBlank
+        String body,
 
-    @NotNull
-    private Long assigneeId;
+        @NotNull
+        Long assigneeId,
 
-    private Boolean filed;
+        Boolean filed
+) {
 }
