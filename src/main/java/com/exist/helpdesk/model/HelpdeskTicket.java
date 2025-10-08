@@ -27,7 +27,7 @@ public class HelpdeskTicket {
 
     private String status;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "assignee_id")
     private Employee assignee;
 
@@ -43,4 +43,7 @@ public class HelpdeskTicket {
     @ElementCollection
     @CollectionTable(name = "ticket_remarks", joinColumns = @JoinColumn(name = "ticket_id"))
     private List<Remark> remarks = new ArrayList<>();
+
+    @Version
+    private Integer version;
 }

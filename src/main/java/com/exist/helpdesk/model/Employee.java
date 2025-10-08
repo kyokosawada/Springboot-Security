@@ -26,8 +26,10 @@ public class Employee {
 
     private String employmentStatus;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "role_id")
     private Role role;
 
+    @Version
+    private Integer version;
 }
