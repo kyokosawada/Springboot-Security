@@ -12,6 +12,7 @@ import org.mapstruct.NullValuePropertyMappingStrategy;
 @Mapper(componentModel = "spring")
 public interface EmployeeMapper {
 
+    @Mapping(target = "password", ignore = true)
     Employee toEntity(EmployeeCreateRequestDTO dto);
 
     EmployeeResponseDTO toResponse(Employee employee);

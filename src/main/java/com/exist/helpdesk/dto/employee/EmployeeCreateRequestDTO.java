@@ -19,6 +19,13 @@ public record EmployeeCreateRequestDTO(
         @NotBlank
         String employmentStatus,
 
-        @NotNull Long roleId
+        @NotBlank
+        String username,
+
+        @NotNull
+        Long roleId,
+
+        @NotBlank
+        String password
 ) {
 }

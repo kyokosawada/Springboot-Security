@@ -24,16 +24,20 @@ import org.springframework.data.jpa.domain.Specification;
 import java.util.List;
 import java.util.ArrayList;
 
+import org.springframework.security.crypto.password.PasswordEncoder;
+
 @Service
 public class EmployeeServiceImpl implements EmployeeService {
     private final EmployeeRepository employeeRepository;
     private final RoleService roleService;
     private final EmployeeMapper employeeMapper;
+    private final PasswordEncoder passwordEncoder;
 
-    public EmployeeServiceImpl(EmployeeRepository employeeRepository, RoleService roleService, EmployeeMapper employeeMapper) {
+    public EmployeeServiceImpl(EmployeeRepository employeeRepository, RoleService roleService, EmployeeMapper employeeMapper, PasswordEncoder passwordEncoder) {
         this.employeeRepository = employeeRepository;
         this.roleService = roleService;
         this.employeeMapper = employeeMapper;
+        this.passwordEncoder = passwordEncoder;
     }
 
     @Override
@@ -86,6 +90,7 @@ public class EmployeeServiceImpl implements EmployeeService {
     @Transactional
     public EmployeeResponseDTO createEmployee(EmployeeCreateRequestDTO dto) {
         Employee employee = employeeMapper.toEntity(dto);
+        employee.setPassword(passwordEncoder.encode(dto.password()));
         Role role = roleService.getRoleEntityById(dto.roleId());
         employee.setRole(role);
         Employee saved = employeeRepository.save(employee);
@@ -101,6 +106,9 @@ public class EmployeeServiceImpl implements EmployeeService {
         if (request.roleId() != null) {
             Role role = roleService.getRoleEntityById(request.roleId());
             emp.setRole(role);
+        }
+        if (request.password() != null) {
+            emp.setPassword(passwordEncoder.encode(request.password()));
         }
         Employee saved = employeeRepository.save(emp);
         return employeeMapper.toResponse(saved);

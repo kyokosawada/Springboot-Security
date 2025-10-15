@@ -6,6 +6,8 @@ public record EmployeeUpdateRequestDTO(
         String address,
         String phone,
         String employmentStatus,
-        Long roleId
+        Long roleId,
+        String password,
+        String username
 ) {
 }

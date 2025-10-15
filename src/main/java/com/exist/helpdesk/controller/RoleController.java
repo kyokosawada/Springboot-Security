@@ -7,6 +7,7 @@ import com.exist.helpdesk.dto.role.RoleResponseDTO;
 import com.exist.helpdesk.dto.PaginatedResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.security.access.prepost.PreAuthorize;
 
 @RestController
 @RequestMapping("/api/roles")
@@ -34,16 +35,19 @@ public class RoleController {
         return roleService.getRoleById(id);
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping
     public RoleResponseDTO createRole(@RequestBody RoleCreateRequestDTO request) {
         return roleService.createRole(request);
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("/{id}")
     public RoleResponseDTO updateRole(@PathVariable Long id, @RequestBody RoleUpdateRequestDTO request) {
         return roleService.updateRole(id, request);
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/{id}")
     public void deleteRole(@PathVariable Long id) {
         roleService.deleteRole(id);

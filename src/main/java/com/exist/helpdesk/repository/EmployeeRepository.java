@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface EmployeeRepository extends JpaRepository<Employee, Long>, JpaSpecificationExecutor<Employee> {
     @Query("SELECT e FROM Employee e")
@@ -26,4 +27,7 @@ public interface EmployeeRepository extends JpaRepository<Employee, Long>, JpaSp
 
     @Query("SELECT e FROM Employee e WHERE e.name = :name AND e.age = :age")
     List<Employee> findByNameAndAge(@Param("name") String name, @Param("age") Integer age);
+
+    @Query("SELECT e FROM Employee e JOIN FETCH e.role WHERE e.username = :username")
+    Optional<Employee> findByUsername(@Param("username") String username);
 }
