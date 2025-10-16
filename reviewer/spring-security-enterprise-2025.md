@@ -224,9 +224,10 @@ security, compliance, and risk management across every line of business.
 Authorization in 2025 is dynamic, fine-grained, context-aware, and enterprise-compliant. Spring Security’s model is:
 
 - **Role-Based Access Control (RBAC):** Assigns permissions to roles, then roles to users. Enterprise-grade RBAC uses
-  role hierarchies (e.g., ADMIN > MANAGER > USER), mapped policies, and explicit permission audits. Annotation-based
-  enforcement (`@PreAuthorize("hasRole('ADMIN')")`, `@Secured`, DSL config) ensures maintainability and compliance,
-  while hierarchical `RoleHierarchyImpl` prevents "role explosion" and enables safe propagation of privileges.
+  explicit and auditable authority mappings, including hierarchical assignments (e.g., ADMIN > MANAGER > USER), all
+  versioned and testable for compliance. Annotation-based
+  enforcement (`@PreAuthorize("hasRole('ADMIN')")`, `@Secured`, DSL config) ensures maintainability, and
+  enterprise policy is now driven by explicit authority aggregation, not magic, "hidden" hierarchies.
 
 ### ABAC: Attribute-Driven, Contextual Enterprise Policy
 
@@ -434,17 +435,132 @@ Mono<Decision> decision = webClient.post()
 Spring Security delivers all these via modular configuration, annotation support, Java DSL, external integrations, and
 robust logging—a strategic layer underneath every enterprise business logic and data access path.
 
-### 3.3 Protecting Web Apps
+### 3.3 Protecting Web Apps: 2025 Enterprise Deep Dive
 
-- Enable full CSRF, CORS, security header (CSP, X-Frame, X-Content-Type) suites.
-- Strictly segment sensitive endpoints. Consider separate filter chains for different roles/resources (e.g., admin
-  panels, APIs).
-- For SPAs/hybrids, implement robust CSRF schemes and ensure cookies are HttpOnly/Secure/sameSite.
-- Harden sessions and account lifecycle for privacy compliance (GDPR, CCPA).
-- Validate and sanitize input at all layers (controller and repository). Defend against XSS, SQLi, and object injection
-  attacks.
-- Rate-limit, monitor, and react to anomalous or brute-force attempts.
-- Invest in observability: audit errors, access denials, and unusual privilege escalations.
+Protecting modern web applications is a multi-layered, ever-evolving challenge. The 2025 enterprise standard covers not
+just classic server-rendered apps, but also:
+
+- SPA (Single-Page Applications)
+- Hybrid (server + client-side rendering)
+- Mobile-first/browserless clients
+- Distributed and zero-trust architectures
+
+#### 🔒 CSRF (Cross-Site Request Forgery) Advanced Strategies
+
+- **Default:** Spring Security enforces CSRF for all browser-facing, session-based endpoints.
+- **SPA/REST:** If APIs are stateless (JWT/OAuth), disable CSRF but audit endpoints for risks.
+- **Trusted Tokens:** Always bind CSRF tokens to session or user context. Use Header-based (e.g., `X-CSRF-TOKEN`) for
+  AJAX/fetch, and Cookie-based for forms.
+- **Untrusted channels:** Never expose CSRF tokens to JavaScript except on trusted origins. Use dual-cookie pattern for
+  SPAs with HttpOnly flag where possible.
+- **Modern Config Example:**
+
+```java
+http.csrf(csrf -> csrf
+  .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
+);
+```
+
+- **For SPAs:** Protect login and privileged endpoints (refresh, critical ops) even if main API is stateless!
+
+#### 🌍 Fine-Grained CORS Management
+
+- **Explicit Origin Whitelisting:** Only allow trusted, known origins (don’t use '*').
+- **Credentialed CORS:** Require credentials flag for cookies/auth:
+
+```java
+http.cors(cors -> cors.configurationSource(request -> {
+    CorsConfiguration config = new CorsConfiguration();
+    config.setAllowedOrigins(List.of("https://app.example.com"));
+    config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE"));
+    config.setAllowCredentials(true); // Needed for cookies/JWT
+    config.setAllowedHeaders(List.of("Authorization", "Content-Type", "X-CSRF-TOKEN"));
+    return config;
+}));
+```
+
+- **Preflight Restrictions:** Restrict allowed headers/methods for OPTIONS/prelight; never leak internal APIs.
+- **Audit for 'wildcard' or legacy CORS headers.**
+
+#### 🛡️ Advanced HTTP Security Headers
+
+- **Content Security Policy (CSP):** Block XSS, control sources for scripts/assets.
+    - Example:
+        - `Content-Security-Policy: default-src 'self'; script-src 'self' https://trusted.cdn.com;`
+    - Use Spring’s `headers().contentSecurityPolicy(...)` DSL.
+- **X-Frame-Options:** Prevent clickjacking (`DENY` or `SAMEORIGIN` config).
+- **Referrer-Policy, Permissions-Policy, X-Content-Type-Options:** Minimize data/attack surface.
+- **Strict-Transport-Security:** Enforce HTTPS at all times.
+- **Spring Config Example:**
+
+```java
+http.headers(headers -> headers
+    .contentSecurityPolicy("default-src 'self'; script-src 'self' ...")
+    .frameOptions(FrameOptionsConfig::sameOrigin)
+    .xssProtection(XXssProtectionConfig::block)
+    .referrerPolicy((policy) -> policy.policy(ReferrerPolicy.SAME_ORIGIN))
+);
+```
+
+#### 🪪 Session Management in SPA & Hybrid Flows
+
+- **Session Rotation on Login/Elevation:** Always use `sessionFixation().migrateSession()` on login/privilege change.
+- **Spring Boot Config:**
+    - `server.servlet.session.timeout=15m` (tune to risk/UX)
+- **Logout/Revocation:** Always enforce server-side logout; for JWT, use blacklist or issue new signing key as needed.
+- **SPAs:**
+    - Short-lived access tokens (5–15m) and long-lived refresh tokens (cookie, secure storage).
+    - Silent token refresh logic: App detects expired token, auto-refreshes in background, never blocks user.
+    - Use HttpOnly/Secure/SameSite cookies for refresh tokens wherever possible (never localStorage for secrets).
+    - Support "global logout" flow: triggers token revocation/device lock, propagating to all app tabs/devices.
+- **Multi-tab/session-aware:** Sync logout/token invalidation across all tabs/devices via BroadcastChannel, service
+  worker, or polling patterns.
+
+#### ⚡️ Authentication Flows for SPA/Mobile
+
+- **OIDC/OAuth2:**
+    - Use PKCE for SPA and mobile flows.
+    - Customize consent pages for phishing/hijack protection.
+- **Token Storage:**
+    - Never store tokens in localStorage if possible; prefer cookies or secure platform storage.
+- **Silent Authentication:**
+    - Detect token expiry and seamlessly refresh with refresh token (never prompt user for password mid-session).
+- **Single Sign-Out (SSO):**
+    - Integrate logout propagation with SSO/IdP and app backend logout endpoint.
+
+####🤖 Anti-Automation & Abuse Mitigation
+
+- Distributed rate-limiting (at gateway and endpoint level); respond with 429 for excessive calls.
+- Bot/probe detection: Add CAPTCHA, device fingerprint, or risk scoring for login/register flows.
+- Enforce exponential backoff or account lock after bad login attempts.
+- Monitor for credential stuffing, replay, brute-force attempts; integrate signals into monitoring and SIEM.
+
+#### 🧑‍💻 Platform-Specific Considerations
+
+- **Mobile Web:** Use secure keychain/secure enclave for credentials/tokens.
+- **Desktop Apps:** Use OS-provided credential stores.
+- **Cross-Domain:** For federated login, never allow implicit grant; favor auth code or device grant.
+- **Third-Party Integrations:** Limit delegated token scopes, rotate secrets, and use consent screens for user clarity.
+
+#### 📈 Observability & Compliance
+
+- Integrate security alerts/logs with SIEM/SOAR platforms.
+- Log all access denials, privilege escalations, and admin operations with correlationID/sessionID.
+- Trace policy violations or anomalous flows in distributed tracing (OpenTelemetry, Zipkin, etc).
+- Automate incident review, and enable replay/reconstruction for post-incident learning.
+
+#### 💎 Summary Checklist
+
+- [ ] CSRF protection (all flows)
+- [ ] CORS strictness (explicit origins, methods, credentials)
+- [ ] All relevant HTTP security headers set
+- [ ] Session management: rotation, timeout, invalidation, forced logout
+- [ ] Robust auth flows: short-lived JWTs, secure refresh, OIDC
+- [ ] Anti-bot, rate limiting, abuse defense
+- [ ] Security observability & actionable alerting
+- [ ] Platform-adaptive best practices (SPA/mobile/desktop)
+
+---
 
 ### 3.4 Advanced Session Management
 
@@ -1003,6 +1119,58 @@ repositories, and event/request buses:
 
 ### RBAC: Enterprise Roles, Hierarchies, and Continuous Compliance
 
+> **Note:** _RoleHierarchyImpl is deprecated as of Spring Security 6+. Do not use it for new code. Explicit authority
+aggregation during authentication is now the recommended approach._
+
+#### Modern Approach: Explicit Authority Aggregation
+
+For each user (or on JWT/token mapping), grant all inherited/parent roles directly as authorities. This ensures
+hierarchical privileges, but keeps everything auditable, testable, and compatible across services.
+
+**Example (UserDetailsService):**
+
+```java
+List<SimpleGrantedAuthority> authorities = new ArrayList<>();
+Role userRole = emp.getRole();
+if (userRole != null) {
+    String name = userRole.getName().toUpperCase();
+    authorities.add(new SimpleGrantedAuthority("ROLE_" + name));
+    if ("ADMIN".equals(name)) {
+        authorities.add(new SimpleGrantedAuthority("ROLE_MANAGER"));
+        authorities.add(new SimpleGrantedAuthority("ROLE_EMPLOYEE"));
+    } else if ("MANAGER".equals(name)) {
+        authorities.add(new SimpleGrantedAuthority("ROLE_EMPLOYEE"));
+    }
+} else {
+    authorities.add(new SimpleGrantedAuthority("ROLE_EMPLOYEE"));
+}
+return new User(emp.getUsername(), emp.getPassword(), authorities);
+```
+
+- This can be extended for DB, claims, SAML/OIDC mapping, etc.
+- Same logic applies for JWT claims: assemble the full list of granted roles (primary + inherited) and encode in the
+  user/roles claim at token creation.
+
+**Auditing/Regulatory:**
+
+- Role assignments and mappings should be version controlled, easy to review, and tested under all critical flows (
+  onboarding, privilege escalation, and offboarding).
+- Automated tests must verify enforcement for all RBAC-protected endpoints for all role combinations—automation is
+  required for regulated industries.
+
+**Multi-tenant/advanced:**
+
+- For tenant/region-aware apps, execute authority aggregation with tenant or zone-specific inheritance trees, keeping
+  all logic explicit and documented.
+
+**Why this approach?**
+
+- 100% observable, deterministic, and debug-friendly—no more hidden privilege inflations.
+- Works in distributed, cloud, and SSO/microservices architectures.
+- Future-proof and vendor-neutral: explicit mapping works the same with JWT, OIDC, SAML, or legacy RBAC.
+
+---
+
 ### ReBAC: Dynamic Graph- and Relationship-Based Access
 
 Relationship-Based Access Control leverages the dynamic structure of relationships in organizations, teams, resources,
@@ -1035,48 +1203,6 @@ or social graphs to finely control authorization—crucial for collaborative Saa
 - Enable graph traversal timeouts/limit depth to avoid performance/denial risks.
 - Require revocation and link review on user, org, or resource lifecycle changes.
 - Integrate all dynamic link changes and privilege escalations with SIEM or compliance/approval workflows.
-
-Role-Based Access Control is the foundation for most enterprise authorization models. Deep best practices include:
-
-- **Multi-Level Role Hierarchy Configuration:** Use Spring RoleHierarchy (Java DSL or YAML) to define parent-child and
-  multi-level inheritance—e.g., ADMIN > MANAGER > USER > VIEWER. Prevent cyclic and recursive mappings (audit surface
-  for accidental privilege leakage).
-- **Dynamic and Static Role Mapping:** Map authorities from SAML2, OIDC/JWT claims, LDAP/AD groups, or custom
-  database/user attributes to Spring roles at runtime. Use centralized converters for external providers, with explicit
-  mapping policies required for audits.
-- **Composite and SpEL Patterns:** Author access rules with rich DSL/SpEL—e.g.,
-  `@PreAuthorize("hasRole('ADMIN') and #project.status == 'ACTIVE'")` or method DSL:
-  `.requestMatchers("/admin/**").hasRole("ADMIN")`.
-- **Group-to-Role Mapping:** For SAML2/LDAP/OIDC, use converter beans to map federation or directory groups to explicit
-  RBAC roles, supporting nested groups with recertification/audit events for membership changes.
-- **RBAC Audit Events:** Emit audit logs on role assignment, removal, privilege escalation, decision evaluation,
-  hierarchy changes, and SoD conflicts. Expose privilege elevation as a privileged/monitored flow.
-- **Compliance Lifecycle:** Institute regular SoD/least privilege reviews, recertification campaigns, privileged account
-  reviews, and automated/reminder notifications for privilege expiry or workflow exception.
-- **Testing and Policy Review:** Test enforcement with integration and policy-based tests—systematically verify all
-  protected endpoints for each role, including negative tests for privilege escalation/bypass.
-- **Multi-Tenant and Context Patterns:** Allow tenant- or region-specific roles/hierarchies by scoping RoleHierarchy and
-  authority mapping per tenant/zone, supporting SaaS multi-tenancy or regulatory segmentation.
-- **Integration with SIEM/Compliance:** Forward all critical RBAC-related events, privilege changes, SoD violations, and
-  role escalation to SIEM/compliance analytics for real-time detection and reporting.
-
-Sample RBAC Java configuration:
-
-```java
-@Bean
-static RoleHierarchy roleHierarchy() {
-  RoleHierarchyImpl hierarchy = new RoleHierarchyImpl();
-  hierarchy.setHierarchy("ROLE_ADMIN > ROLE_MANAGER \n ROLE_MANAGER > ROLE_USER \n ROLE_USER > ROLE_VIEWER");
-  return hierarchy;
-}
-```
-
-**Enterprise Best Practices:**
-
-- Regularly review and recertify all privileged/critical roles and top-level inheritance paths.
-- Automate audits for stale roles, excessive privilege, and SoD conflicts.
-- Limit assignment of composite roles to minimize blast radius of misconfiguration.
-- Conduct RBAC policy review as part of every release and compliance change.
 
 ### Method-level Security: Service-Layer Enforcement, Testability, and Context
 
