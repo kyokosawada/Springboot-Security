@@ -3,23 +3,26 @@ package com.exist.helpdesk.service.impl;
 import com.exist.helpdesk.dto.auth.LoginRequestDTO;
 import com.exist.helpdesk.dto.auth.LoginResponseDTO;
 import com.exist.helpdesk.service.AuthService;
-import com.exist.helpdesk.utils.JwtUtil;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.exist.helpdesk.utils.JwtUtils;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
-@Service
-public class AuthServiceImpl implements AuthService {
-    private final AuthenticationManager authenticationManager;
-    private final JwtUtil jwtUtil;
+import java.util.stream.Collectors;
+import java.util.List;
 
-    @Autowired
-    public AuthServiceImpl(AuthenticationManager authenticationManager, JwtUtil jwtUtil) {
+import org.springframework.security.core.GrantedAuthority;
+
+@Service
+public class  AuthServiceImpl implements AuthService {
+    private final AuthenticationManager authenticationManager;
+    private final JwtUtils jwtUtils;
+
+    public AuthServiceImpl(AuthenticationManager authenticationManager, JwtUtils jwtUtils) {
         this.authenticationManager = authenticationManager;
-        this.jwtUtil = jwtUtil;
+        this.jwtUtils = jwtUtils;
     }
 
     @Override
@@ -29,8 +32,11 @@ public class AuthServiceImpl implements AuthService {
                         loginRequest.username(), loginRequest.password())
         );
         UserDetails userDetails = (UserDetails) authentication.getPrincipal();
-        String role = userDetails.getAuthorities().stream().findFirst().map(a -> a.getAuthority().replace("ROLE_", "")).orElse("EMPLOYEE");
-        String token = jwtUtil.generateToken(userDetails.getUsername(), role);
+        List<String> authorities = userDetails.getAuthorities().stream()
+                .map(GrantedAuthority::getAuthority)
+                .collect(Collectors.toList());
+        String token = jwtUtils.generateToken(userDetails.getUsername(), authorities);
+        String role = authorities.isEmpty() ? "EMPLOYEE" : authorities.get(0);
         return new LoginResponseDTO(token, userDetails.getUsername(), role);
     }
 }
