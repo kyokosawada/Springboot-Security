@@ -19,6 +19,7 @@ public class RoleController {
         this.roleService = roleService;
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping
     public PaginatedResponse<RoleResponseDTO> getRoles(
             @RequestParam(defaultValue = "0") int page,

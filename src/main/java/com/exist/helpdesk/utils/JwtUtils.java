@@ -16,7 +16,6 @@ public class JwtUtils {
     @Value("${spring.security.oauth2.resourceserver.jwt.secret}")
     private String secret;
     private SecretKey secretKey;
-    private long jwtExpirationMs = 900000;
 
     @PostConstruct
     public void init() {
@@ -24,6 +23,7 @@ public class JwtUtils {
     }
 
     public String generateToken(String username, List<String> authorities) {
+        long jwtExpirationMs = 900000;
         return Jwts.builder()
                 .setSubject(username)
                 .claim("authorities", authorities)

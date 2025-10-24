@@ -36,7 +36,7 @@ public class  AuthServiceImpl implements AuthService {
                 .map(GrantedAuthority::getAuthority)
                 .collect(Collectors.toList());
         String token = jwtUtils.generateToken(userDetails.getUsername(), authorities);
-        String role = authorities.isEmpty() ? "EMPLOYEE" : authorities.get(0);
+        String role = authorities.get(0);
         return new LoginResponseDTO(token, userDetails.getUsername(), role);
     }
 }
